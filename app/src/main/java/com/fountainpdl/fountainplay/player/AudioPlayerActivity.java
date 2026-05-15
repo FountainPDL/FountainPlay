@@ -58,6 +58,7 @@ public class AudioPlayerActivity extends AppCompatActivity {
 
         // Set metadata
         tvTitle.setText(title != null ? title : "Unknown Title");
+        tvTitle.setSelected(true);
         tvArtist.setText(artist != null ? artist : "Unknown Artist");
 
         if (albumArt != null) {
