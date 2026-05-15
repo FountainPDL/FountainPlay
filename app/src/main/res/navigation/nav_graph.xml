@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/nav_home">
+    <fragment android:id="@+id/nav_home" android:name="com.fountainpdl.fountainplay.ui.home.HomeFragment" android:label="Home" />
+    <fragment android:id="@+id/nav_music" android:name="com.fountainpdl.fountainplay.ui.music.MusicFragment" android:label="Music" />
+    <fragment android:id="@+id/nav_video" android:name="com.fountainpdl.fountainplay.ui.video.VideoFragment" android:label="Video" />
+    <fragment android:id="@+id/nav_library" android:name="com.fountainpdl.fountainplay.ui.library.LibraryFragment" android:label="Library" />
+</navigation>
