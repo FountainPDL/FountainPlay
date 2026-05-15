@@ -57,6 +57,7 @@ public class AudioPlayerActivity extends AppCompatActivity {
         btnRepeat = findViewById(R.id.btn_repeat);
 
         // Set metadata
+        tvTitle.setSelected(true);
         tvTitle.setText(title != null ? title : "Unknown Title");
         tvTitle.setSelected(true);
         tvArtist.setText(artist != null ? artist : "Unknown Artist");
