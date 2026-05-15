@@ -11,4 +11,11 @@
     <string name="no_media_found">No media found</string>
     <string name="channel_name">Fountain Play</string>
     <string name="channel_desc">Media playback notification</string>
+    <string name="all_songs">All Songs</string>
+    <string name="all_videos">All Videos</string>
+    <string name="sort_by">Sort by</string>
+    <string name="lyrics">Lyrics</string>
+    <string name="queue">Queue</string>
+    <string name="unknown_artist">Unknown Artist</string>
+    <string name="unknown_album">Unknown Album</string>
 </resources>
