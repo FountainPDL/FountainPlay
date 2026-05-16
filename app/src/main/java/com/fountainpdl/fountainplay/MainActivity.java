@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements PlaybackState.Lis
     }
 
     private void setupMiniPlayer() {
-        miniPlayer = binding.miniPlayer;
+        miniPlayer = binding.miniPlayer.getRoot();
         miniArt = miniPlayer.findViewById(R.id.mini_album_art);
         miniTitle = miniPlayer.findViewById(R.id.mini_title);
         miniArtist = miniPlayer.findViewById(R.id.mini_artist);
