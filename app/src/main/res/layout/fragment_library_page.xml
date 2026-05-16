@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/background_dark">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_library"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingBottom="100dp" />
+
+    <TextView android:id="@+id/tv_empty"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:text="Nothing here yet" android:textColor="@color/on_surface_variant_dark"
+        android:textSize="16sp" android:gravity="center" android:padding="48dp"
+        android:visibility="gone" />
+</LinearLayout>

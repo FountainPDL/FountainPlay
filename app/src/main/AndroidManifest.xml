@@ -16,18 +16,19 @@
         android:theme="@style/Theme.FountainPlay"
         android:largeHeap="true">
 
-        <activity android:name=".MainActivity" android:exported="true">
+        <activity android:name=".MainActivity" android:exported="true"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <!-- Video player — registered for ALL video types -->
-        <activity
-            android:name=".player.VideoPlayerActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden"
+        <!-- Video: PiP enabled -->
+        <activity android:name=".player.VideoPlayerActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
             android:screenOrientation="sensor"
+            android:supportsPictureInPicture="true"
             android:exported="true"
             android:theme="@style/Theme.FountainPlay.Player">
             <intent-filter>
@@ -42,16 +43,11 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="content" android:mimeType="video/*" />
             </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data android:scheme="http" android:mimeType="video/*" />
-            </intent-filter>
         </activity>
 
-        <!-- Audio player — registered for ALL audio types -->
-        <activity
-            android:name=".player.AudioPlayerActivity"
+        <!-- Audio: background-capable -->
+        <activity android:name=".player.AudioPlayerActivity"
+            android:configChanges="orientation|screenSize"
             android:exported="true"
             android:theme="@style/Theme.FountainPlay.Player">
             <intent-filter>
@@ -66,15 +62,9 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="content" android:mimeType="audio/*" />
             </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data android:scheme="http" android:mimeType="audio/*" />
-            </intent-filter>
         </activity>
 
-        <service
-            android:name=".service.PlaybackService"
+        <service android:name=".service.PlaybackService"
             android:exported="true"
             android:foregroundServiceType="mediaPlayback">
             <intent-filter>

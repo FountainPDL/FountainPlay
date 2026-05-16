@@ -2,36 +2,66 @@
 <androidx.core.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/background_dark">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingBottom="16dp">
-        <TextView
-            android:id="@+id/tv_greeting"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Good evening"
-            android:textSize="26sp"
-            android:textStyle="bold"
-            android:paddingHorizontal="16dp"
-            android:paddingTop="24dp" />
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Recently Played"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:paddingHorizontal="16dp"
-            android:paddingTop="20dp"
-            android:paddingBottom="8dp" />
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_recent"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingHorizontal="8dp"
+        android:paddingBottom="120dp">
+
+        <!-- Greeting -->
+        <TextView android:id="@+id/tv_greeting"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:textSize="28sp" android:textStyle="bold"
+            android:textColor="@color/white"
+            android:paddingHorizontal="16dp" android:paddingTop="24dp" android:paddingBottom="8dp" />
+
+        <!-- Recently Played Music -->
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical"
+            android:paddingHorizontal="16dp" android:paddingTop="20dp" android:paddingBottom="8dp">
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="Recently Played"
+                android:textSize="18sp" android:textStyle="bold" android:textColor="@color/white" />
+            <TextView android:id="@+id/tv_see_all_music"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="See all" android:textColor="@color/fp_purple_light" android:textSize="13sp" />
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView android:id="@+id/rv_recently_played"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:paddingHorizontal="8dp"
             android:clipToPadding="false" />
+
+        <!-- Recently Added Music -->
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical"
+            android:paddingHorizontal="16dp" android:paddingTop="20dp" android:paddingBottom="8dp">
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="Recently Added Music"
+                android:textSize="18sp" android:textStyle="bold" android:textColor="@color/white" />
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView android:id="@+id/rv_recent_music"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:paddingHorizontal="8dp"
+            android:clipToPadding="false" />
+
+        <!-- Recently Added Videos -->
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical"
+            android:paddingHorizontal="16dp" android:paddingTop="20dp" android:paddingBottom="8dp">
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:text="Recently Added Videos"
+                android:textSize="18sp" android:textStyle="bold" android:textColor="@color/white" />
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView android:id="@+id/rv_recent_videos"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:paddingHorizontal="8dp"
+            android:clipToPadding="false" />
+
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

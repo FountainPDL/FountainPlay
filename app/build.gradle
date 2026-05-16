@@ -8,10 +8,10 @@ android {
 
     defaultConfig {
         applicationId "com.fountainpdl.fountainplay"
-        minSdk 24
+        minSdk 26
         targetSdk 34
-        versionCode 1
-        versionName "1.0.0"
+        versionCode 2
+        versionName "1.1.0"
     }
 
     buildTypes {
@@ -48,6 +48,5 @@ dependencies {
     implementation 'androidx.viewpager2:viewpager2:1.0.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.7.0'
     implementation 'androidx.lifecycle:lifecycle-livedata:2.7.0'
-    implementation 'androidx.preference:preference:1.2.1'
     implementation 'com.squareup.okhttp3:okhttp:4.12.0'
 }
