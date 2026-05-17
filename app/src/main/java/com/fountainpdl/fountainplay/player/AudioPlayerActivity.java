@@ -24,6 +24,7 @@ import com.fountainpdl.fountainplay.service.PlaybackService;
 import com.fountainpdl.fountainplay.util.AppPreferences;
 import com.fountainpdl.fountainplay.util.PlayQueue;
 import com.fountainpdl.fountainplay.util.PlaybackState;
+import com.fountainpdl.fountainplay.adapter.QueueAdapter;
 import com.google.android.material.chip.Chip;
 import java.util.ArrayList;
 import java.util.List;
