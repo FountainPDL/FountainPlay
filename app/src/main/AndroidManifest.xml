@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29"/>
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
+        android:name=".FountainApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -24,10 +26,8 @@
             </intent-filter>
         </activity>
 
-        <!-- Video: PiP enabled -->
         <activity android:name=".player.VideoPlayerActivity"
             android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
-            android:screenOrientation="sensor"
             android:supportsPictureInPicture="true"
             android:exported="true"
             android:theme="@style/Theme.FountainPlay.Player">
@@ -45,7 +45,6 @@
             </intent-filter>
         </activity>
 
-        <!-- Audio: background-capable -->
         <activity android:name=".player.AudioPlayerActivity"
             android:configChanges="orientation|screenSize"
             android:exported="true"
@@ -64,13 +63,23 @@
             </intent-filter>
         </activity>
 
+        <!-- Sticky foreground service — survives app removal from recents -->
         <service android:name=".service.PlaybackService"
             android:exported="true"
+            android:stopWithTask="false"
             android:foregroundServiceType="mediaPlayback">
             <intent-filter>
                 <action android:name="androidx.media3.session.MediaSessionService" />
             </intent-filter>
         </service>
+
+        <!-- Restart service after boot -->
+        <receiver android:name=".service.BootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
 
     </application>
 </manifest>

@@ -1,18 +1,19 @@
 package com.fountainpdl.fountainplay;
 
 import android.Manifest;
-import android.content.Intent;
+import android.content.*;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
+import android.view.animation.ScaleAnimation;
+import android.view.animation.Animation;
+import android.widget.*;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.navigation.NavController;
@@ -22,27 +23,40 @@ import com.bumptech.glide.Glide;
 import com.fountainpdl.fountainplay.databinding.ActivityMainBinding;
 import com.fountainpdl.fountainplay.model.MediaItem;
 import com.fountainpdl.fountainplay.player.AudioPlayerActivity;
+import com.fountainpdl.fountainplay.service.PlaybackService;
 import com.fountainpdl.fountainplay.util.PlaybackState;
 
 public class MainActivity extends AppCompatActivity implements PlaybackState.Listener {
 
     private ActivityMainBinding binding;
     private NavController navController;
-    private static final int PERMISSION_REQUEST = 100;
+    private static final int PERM_REQUEST = 100;
+
+    private PlaybackService service;
+    private boolean bound = false;
 
     // Mini player views
-    private View miniPlayer;
+    private CardView miniPlayerCard;
     private ImageView miniArt;
     private TextView miniTitle, miniArtist;
     private ImageButton miniPlayPause, miniPrev, miniNext, miniClose;
     private ProgressBar miniProgress;
 
+    private final ServiceConnection conn = new ServiceConnection() {
+        @Override public void onServiceConnected(ComponentName n, IBinder b) {
+            service = ((PlaybackService.LocalBinder) b).getService();
+            bound = true;
+            // Restore mini player if something is playing
+            MediaItem cur = PlaybackState.get().getCurrentItem();
+            if (cur != null) showMiniPlayer(cur);
+        }
+        @Override public void onServiceDisconnected(ComponentName n) { bound = false; }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Full screen + keep screen on for video
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             getWindow().getAttributes().layoutInDisplayCutoutMode =
                 WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
@@ -53,31 +67,36 @@ public class MainActivity extends AppCompatActivity implements PlaybackState.Lis
 
         setupNavigation();
         setupMiniPlayer();
-        requestStoragePermissions();
+        requestPermissions();
 
         PlaybackState.get().addListener(this);
+
+        // Bind to persistent service
+        Intent svc = new Intent(this, PlaybackService.class);
+        startService(svc);
+        bindService(svc, conn, BIND_AUTO_CREATE);
     }
 
     private void setupNavigation() {
-        NavHostFragment navHostFragment = (NavHostFragment)
+        NavHostFragment host = (NavHostFragment)
             getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
-        navController = navHostFragment.getNavController();
+        navController = host.getNavController();
         NavigationUI.setupWithNavController(binding.bottomNav, navController);
     }
 
     private void setupMiniPlayer() {
-        miniPlayer = binding.miniPlayer.getRoot();
-        miniArt = miniPlayer.findViewById(R.id.mini_album_art);
-        miniTitle = miniPlayer.findViewById(R.id.mini_title);
-        miniArtist = miniPlayer.findViewById(R.id.mini_artist);
-        miniPlayPause = miniPlayer.findViewById(R.id.mini_play_pause);
-        miniPrev = miniPlayer.findViewById(R.id.mini_prev);
-        miniNext = miniPlayer.findViewById(R.id.mini_next);
-        miniClose = miniPlayer.findViewById(R.id.mini_close);
-        miniProgress = miniPlayer.findViewById(R.id.mini_progress);
+        miniPlayerCard = findViewById(R.id.mini_player);
+        miniArt        = miniPlayerCard.findViewById(R.id.mini_album_art);
+        miniTitle      = miniPlayerCard.findViewById(R.id.mini_title);
+        miniArtist     = miniPlayerCard.findViewById(R.id.mini_artist);
+        miniPlayPause  = miniPlayerCard.findViewById(R.id.mini_play_pause);
+        miniPrev       = miniPlayerCard.findViewById(R.id.mini_prev);
+        miniNext       = miniPlayerCard.findViewById(R.id.mini_next);
+        miniClose      = miniPlayerCard.findViewById(R.id.mini_close);
+        miniProgress   = miniPlayerCard.findViewById(R.id.mini_progress);
 
-        // Tap mini player → reopen audio player
-        miniPlayer.setOnClickListener(v -> {
+        // Tap mini player → open full audio player
+        miniPlayerCard.setOnClickListener(v -> {
             MediaItem cur = PlaybackState.get().getCurrentItem();
             if (cur != null && cur.isAudio()) {
                 Intent i = new Intent(this, AudioPlayerActivity.class);
@@ -90,76 +109,77 @@ public class MainActivity extends AppCompatActivity implements PlaybackState.Lis
             }
         });
 
-        miniClose.setOnClickListener(v -> {
-            miniPlayer.setVisibility(View.GONE);
-            PlaybackState.get().setCurrentItem(null);
+        miniPlayPause.setOnClickListener(v -> {
+            if (bound) {
+                service.playPause();
+                pulse(miniPlayPause);
+            }
         });
 
-        // Play/pause, prev, next wired via PlaybackState broadcast
-        miniPlayPause.setOnClickListener(v -> {
-            // Signal the active player via broadcast
-            sendBroadcast(new Intent("com.fountainpdl.fountainplay.TOGGLE_PLAY"));
+        miniPrev.setOnClickListener(v -> { if (bound) service.skipPrevious(); });
+        miniNext.setOnClickListener(v -> { if (bound) service.skipNext(); });
+
+        miniClose.setOnClickListener(v -> {
+            if (bound) { service.getPlayer().stop(); }
+            PlaybackState.get().setCurrentItem(null);
+            miniPlayerCard.setVisibility(View.GONE);
         });
-        miniNext.setOnClickListener(v ->
-            sendBroadcast(new Intent("com.fountainpdl.fountainplay.NEXT")));
-        miniPrev.setOnClickListener(v ->
-            sendBroadcast(new Intent("com.fountainpdl.fountainplay.PREV")));
     }
 
     public void showMiniPlayer(MediaItem item) {
-        if (item == null) return;
-        miniPlayer.setVisibility(View.VISIBLE);
+        if (item == null || !item.isAudio()) return;
+        miniPlayerCard.setVisibility(View.VISIBLE);
         miniTitle.setText(item.getTitle());
         miniArtist.setText(item.getArtist());
-        if (item.getAlbumArtUri() != null) {
-            Glide.with(this).load(item.getAlbumArtUri()).centerCrop().into(miniArt);
-        } else {
-            miniArt.setImageResource(android.R.drawable.ic_media_play);
-        }
+        if (item.getAlbumArtUri() != null)
+            Glide.with(this).load(item.getAlbumArtUri()).centerCrop()
+                .placeholder(R.drawable.bg_play_button).into(miniArt);
+        else miniArt.setImageResource(R.drawable.bg_play_button);
+
+        // Animate in
+        miniPlayerCard.setAlpha(0f);
+        miniPlayerCard.setTranslationY(40f);
+        miniPlayerCard.animate().alpha(1f).translationY(0f).setDuration(250).start();
     }
 
-    public void updateMiniProgress(int progress) {
-        miniProgress.setProgress(progress);
+    private void pulse(View v) {
+        ScaleAnimation a = new ScaleAnimation(1f,1.25f,1f,1.25f,
+            Animation.RELATIVE_TO_SELF,.5f,Animation.RELATIVE_TO_SELF,.5f);
+        a.setDuration(80); a.setRepeatCount(1); a.setRepeatMode(Animation.REVERSE);
+        v.startAnimation(a);
     }
 
-    public void hideMiniPlayer() {
-        miniPlayer.setVisibility(View.GONE);
+    @Override public void onItemChanged(MediaItem item) {
+        runOnUiThread(() -> { if (item != null && item.isAudio()) showMiniPlayer(item); });
     }
 
-    @Override
-    public void onItemChanged(MediaItem item) {
-        runOnUiThread(() -> {
-            if (item != null) showMiniPlayer(item);
-            else hideMiniPlayer();
-        });
-    }
-
-    @Override
-    public void onPlayStateChanged(boolean playing) {
+    @Override public void onPlayStateChanged(boolean playing) {
         runOnUiThread(() -> miniPlayPause.setImageResource(
             playing ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play));
     }
 
-    @Override
-    public void onPositionChanged(long pos, long duration) {
-        if (duration > 0) runOnUiThread(() ->
-            updateMiniProgress((int)(pos * 1000 / duration)));
+    @Override public void onPositionChanged(long pos, long dur) {
+        if (dur > 0) runOnUiThread(() ->
+            miniProgress.setProgress((int)(pos * 1000 / dur)));
     }
 
-    private void requestStoragePermissions() {
+    private void requestPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            String[] perms = {Manifest.permission.READ_MEDIA_AUDIO, Manifest.permission.READ_MEDIA_VIDEO};
-            boolean allGranted = true;
-            for (String p : perms)
-                if (ContextCompat.checkSelfPermission(this, p) != PackageManager.PERMISSION_GRANTED) { allGranted = false; break; }
-            if (!allGranted) ActivityCompat.requestPermissions(this, perms, PERMISSION_REQUEST);
+            String[] p = {Manifest.permission.READ_MEDIA_AUDIO, Manifest.permission.READ_MEDIA_VIDEO};
+            boolean ok = true;
+            for (String s : p) if (ContextCompat.checkSelfPermission(this,s)!=PackageManager.PERMISSION_GRANTED){ok=false;break;}
+            if (!ok) ActivityCompat.requestPermissions(this, p, PERM_REQUEST);
         } else {
             String p = Manifest.permission.READ_EXTERNAL_STORAGE;
-            if (ContextCompat.checkSelfPermission(this, p) != PackageManager.PERMISSION_GRANTED)
-                ActivityCompat.requestPermissions(this, new String[]{p}, PERMISSION_REQUEST);
+            if (ContextCompat.checkSelfPermission(this,p)!=PackageManager.PERMISSION_GRANTED)
+                ActivityCompat.requestPermissions(this,new String[]{p},PERM_REQUEST);
         }
     }
 
-    @Override public boolean onSupportNavigateUp() { return navController.navigateUp() || super.onSupportNavigateUp(); }
-    @Override protected void onDestroy() { super.onDestroy(); PlaybackState.get().removeListener(this); }
+    @Override public boolean onSupportNavigateUp() { return navController.navigateUp()||super.onSupportNavigateUp(); }
+    @Override protected void onDestroy() {
+        super.onDestroy();
+        PlaybackState.get().removeListener(this);
+        if (bound) { unbindService(conn); bound = false; }
+    }
 }

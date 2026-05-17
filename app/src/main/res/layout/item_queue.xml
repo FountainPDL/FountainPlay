@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="56dp"
+    android:orientation="horizontal" android:gravity="center_vertical"
+    android:paddingHorizontal="8dp"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true" android:focusable="true">
+
+    <TextView android:id="@+id/tv_queue_num"
+        android:layout_width="28dp" android:layout_height="wrap_content"
+        android:textColor="@color/on_surface_variant_dark" android:textSize="12sp"
+        android:gravity="center" />
+
+    <ImageView android:id="@+id/iv_queue_art"
+        android:layout_width="38dp" android:layout_height="38dp"
+        android:scaleType="centerCrop" android:background="@color/fp_purple_dark"
+        android:layout_marginHorizontal="8dp" />
+
+    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+        android:layout_weight="1" android:orientation="vertical">
+        <TextView android:id="@+id/tv_queue_title"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:textColor="@color/white" android:textSize="13sp" android:textStyle="bold"
+            android:maxLines="1" android:ellipsize="end" />
+        <TextView android:id="@+id/tv_queue_artist"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:textColor="@color/on_surface_variant_dark" android:textSize="11sp"
+            android:maxLines="1" android:ellipsize="end" />
+    </LinearLayout>
+
+    <TextView android:id="@+id/tv_queue_dur"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:textColor="@color/on_surface_variant_dark" android:textSize="11sp"
+        android:paddingEnd="8dp" />
+
+    <ImageView android:id="@+id/iv_now_playing_indicator"
+        android:layout_width="18dp" android:layout_height="18dp"
+        android:src="@android:drawable/ic_media_play"
+        android:tint="@color/fp_purple_light"
+        android:visibility="gone" />
+</LinearLayout>

@@ -11,28 +11,24 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
 public class LibraryFragment extends Fragment {
-
-    private static final String[] TABS = {"Songs", "Albums", "Artists", "Playlists", "History"};
+    private static final String[] TABS = {"Songs","Albums","Artists","Playlists","History"};
 
     @Nullable @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_library, container, false);
+    public View onCreateView(@NonNull LayoutInflater inf, @Nullable ViewGroup c, @Nullable Bundle s) {
+        return inf.inflate(R.layout.fragment_library, c, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         ViewPager2 vp = view.findViewById(R.id.view_pager);
         TabLayout tabs = view.findViewById(R.id.tab_layout);
-
         vp.setAdapter(new FragmentStateAdapter(this) {
-            @NonNull @Override public Fragment createFragment(int pos) { return LibraryPageFragment.newInstance(TABS[pos]); }
+            @NonNull @Override public Fragment createFragment(int pos) {
+                return LibraryPageFragment.newInstance(TABS[pos]);
+            }
             @Override public int getItemCount() { return TABS.length; }
         });
-
         new TabLayoutMediator(tabs, vp, (tab, pos) -> tab.setText(TABS[pos])).attach();
     }
 }

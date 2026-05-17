@@ -1,22 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Base dark theme (default) -->
     <style name="Theme.FountainPlay" parent="Theme.Material3.Dark.NoActionBar">
         <item name="colorPrimary">@color/fp_purple</item>
-        <item name="colorPrimaryDark">@color/fp_purple_dark</item>
-        <item name="colorAccent">@color/fp_red</item>
+        <item name="colorPrimaryVariant">@color/fp_purple_dark</item>
+        <item name="colorSecondary">@color/fp_red</item>
         <item name="colorSurface">@color/surface_dark</item>
         <item name="colorOnSurface">@color/on_surface_dark</item>
+        <item name="android:colorBackground">@color/background_dark</item>
         <item name="android:windowBackground">@color/background_dark</item>
         <item name="android:statusBarColor">@color/background_dark</item>
         <item name="android:navigationBarColor">@color/surface_dark</item>
         <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
     </style>
+
+    <!-- Light theme -->
+    <style name="Theme.FountainPlay.Light" parent="Theme.Material3.Light.NoActionBar">
+        <item name="colorPrimary">@color/fp_purple</item>
+        <item name="colorPrimaryVariant">@color/fp_purple_dark</item>
+        <item name="colorSecondary">@color/fp_red</item>
+        <item name="colorSurface">@color/surface_light</item>
+        <item name="colorOnSurface">@color/on_surface_light</item>
+        <item name="android:colorBackground">@color/background_light</item>
+        <item name="android:windowBackground">@color/background_light</item>
+        <item name="android:statusBarColor">@color/fp_purple_dark</item>
+        <item name="android:navigationBarColor">@color/surface_light</item>
+    </style>
+
+    <!-- AMOLED true black -->
+    <style name="Theme.FountainPlay.AMOLED" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/fp_purple_light</item>
+        <item name="colorSecondary">@color/fp_red_light</item>
+        <item name="colorSurface">@color/surface_amoled</item>
+        <item name="colorOnSurface">@color/white</item>
+        <item name="android:colorBackground">@color/background_amoled</item>
+        <item name="android:windowBackground">@color/background_amoled</item>
+        <item name="android:statusBarColor">@color/background_amoled</item>
+        <item name="android:navigationBarColor">@color/background_amoled</color>
+    </style>
+
+    <!-- Player (always dark) -->
     <style name="Theme.FountainPlay.Player" parent="Theme.Material3.Dark.NoActionBar">
         <item name="colorPrimary">@color/fp_purple</item>
         <item name="android:windowBackground">@color/player_bg_dark</item>
         <item name="android:statusBarColor">@color/transparent</item>
         <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:windowFullscreen">false</item>
         <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
     </style>
 </resources>
