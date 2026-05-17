@@ -120,6 +120,5 @@
         app:itemTextColor="@color/nav_item_color"
         app:labelVisibilityMode="labeled"
         app:itemRippleColor="@color/fp_purple"
-        app:itemActiveIndicatorColor="#33BB86FC" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
