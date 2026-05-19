@@ -120,7 +120,8 @@ public class MusicFragment extends Fragment {
             var playlists = com.fountainpdl.fountainplay.db.AppDatabase.get(requireContext()).playlistDao().getAllPlaylists();
             requireActivity().runOnUiThread(() -> {
                 if (playlists.isEmpty()) { Toast.makeText(requireContext(),"No playlists. Create one in Library.",Toast.LENGTH_SHORT).show(); return; }
-                String[] names = playlists.stream().map(p -> p.name).toArray(String[]::new);
+                String[] names = new String[playlists.size()];
+                for (int ii=0;ii<playlists.size();ii++) names[ii] = playlists.get(ii).name;
                 new AlertDialog.Builder(requireContext()).setTitle("Add to Playlist")
                     .setItems(names, (d, i) -> new Thread(() -> {
                         var song = new com.fountainpdl.fountainplay.db.entity.PlaylistSong();
