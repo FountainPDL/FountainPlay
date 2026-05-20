@@ -53,8 +53,9 @@ public class MainActivity extends BaseActivity implements PlaybackState.Listener
         NavHostFragment host = (NavHostFragment)
             getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
         navController = host.getNavController();
-        NavigationUI.setupWithNavController(
-            findViewById(R.id.bottom_nav), navController);
+        com.google.android.material.bottomnavigation.BottomNavigationView bnv =
+            findViewById(R.id.bottom_nav);
+        NavigationUI.setupWithNavController(bnv, navController);
 
         setupMiniPlayer();
         requestPermissions();

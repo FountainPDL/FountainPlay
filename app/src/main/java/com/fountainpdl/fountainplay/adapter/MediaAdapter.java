@@ -106,6 +106,15 @@ public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             if (longListener != null) longListener.onItemLong(item, pos, v);
             return true;
         });
+        // Wire ⋮ button from either item layout
+        android.widget.ImageButton moreBtn = holder.itemView.findViewById(R.id.btn_song_more);
+        if (moreBtn == null) moreBtn = holder.itemView.findViewById(R.id.btn_video_more);
+        if (moreBtn != null) {
+            final android.widget.ImageButton finalMore = moreBtn;
+            finalMore.setOnClickListener(v -> {
+                if (longListener != null) longListener.onItemLong(item, pos, holder.itemView);
+            });
+        }
     }
 
     @Override public int getItemCount() { return items.size(); }
@@ -126,11 +135,7 @@ public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 Glide.with(itemView).load(item.getAlbumArtUri()).centerCrop()
                     .placeholder(R.drawable.bg_play_button).into(art);
             else art.setImageResource(R.drawable.bg_play_button);
-            // wire ⋮ button to trigger long-press listener
-            android.widget.ImageButton more = itemView.findViewById(R.id.btn_song_more);
-            if (more != null) more.setOnClickListener(v -> {
-                if (longListener != null) longListener.onItemLong(item, getAdapterPosition(), itemView);
-            });
+            // wired in onBindViewHolder
         }
     }
 
