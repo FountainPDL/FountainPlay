@@ -3,215 +3,168 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_dark">
+    android:background="?attr/android:colorBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingBottom="100dp">
+        android:paddingBottom="120dp">
 
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="Settings" android:textSize="24sp" android:textStyle="bold"
-            android:textColor="@color/white" android:padding="16dp" />
+            android:text="Settings" android:textSize="26sp" android:textStyle="bold"
+            android:textColor="?attr/colorOnSurface" android:padding="16dp" />
 
-        <!-- APPEARANCE -->
-        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="  APPEARANCE" android:textSize="11sp" android:textColor="@color/fp_purple_light"
-            android:textStyle="bold" android:paddingTop="16dp" android:paddingBottom="4dp" />
+        <!-- ── APPEARANCE ── -->
+        <TextView style="@style/SettingsSectionHeader" android:text="APPEARANCE" />
 
-        <LinearLayout android:id="@+id/pref_theme"
-            android:layout_width="match_parent" android:layout_height="56dp"
-            android:orientation="horizontal" android:gravity="center_vertical"
-            android:paddingHorizontal="16dp" android:background="?attr/selectableItemBackground"
-            android:clickable="true" android:focusable="true">
-            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+        <!-- Theme -->
+        <LinearLayout android:id="@+id/pref_theme" style="@style/SettingsRow">
+            <LinearLayout style="@style/SettingsRowContent">
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Theme" android:textColor="@color/white" android:textSize="15sp" />
-                <TextView android:id="@+id/tv_theme_value" android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Dark" android:textColor="@color/on_surface_variant_dark" android:textSize="13sp" />
+                    android:text="Theme" style="@style/SettingsRowTitle" />
+                <TextView android:id="@+id/tv_theme_value" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:text="Dark"
+                    style="@style/SettingsRowSub" />
             </LinearLayout>
         </LinearLayout>
 
-        <LinearLayout android:id="@+id/pref_primary_color"
-            android:layout_width="match_parent" android:layout_height="56dp"
-            android:orientation="horizontal" android:gravity="center_vertical"
-            android:paddingHorizontal="16dp" android:background="?attr/selectableItemBackground"
-            android:clickable="true" android:focusable="true">
-            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+        <!-- Color scheme -->
+        <LinearLayout android:id="@+id/pref_primary_color" style="@style/SettingsRow">
+            <LinearLayout style="@style/SettingsRowContent">
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Primary Color" android:textColor="@color/white" android:textSize="15sp" />
+                    android:text="Color Scheme" style="@style/SettingsRowTitle" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Purple (default)" android:textColor="@color/on_surface_variant_dark" android:textSize="13sp" />
+                    android:text="Choose primary + accent colors"
+                    style="@style/SettingsRowSub" />
             </LinearLayout>
             <View android:id="@+id/color_preview_primary"
                 android:layout_width="28dp" android:layout_height="28dp"
-                android:background="@color/fp_purple" />
-        </LinearLayout>
-
-        <LinearLayout android:id="@+id/pref_accent_color"
-            android:layout_width="match_parent" android:layout_height="56dp"
-            android:orientation="horizontal" android:gravity="center_vertical"
-            android:paddingHorizontal="16dp" android:background="?attr/selectableItemBackground"
-            android:clickable="true" android:focusable="true">
-            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Accent Color" android:textColor="@color/white" android:textSize="15sp" />
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Red (default)" android:textColor="@color/on_surface_variant_dark" android:textSize="13sp" />
-            </LinearLayout>
+                android:background="@color/fp_purple"
+                android:layout_marginEnd="6dp" />
             <View android:id="@+id/color_preview_accent"
                 android:layout_width="28dp" android:layout_height="28dp"
                 android:background="@color/fp_red" />
         </LinearLayout>
 
-        <!-- PLAYBACK -->
-        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="  PLAYBACK" android:textSize="11sp" android:textColor="@color/fp_purple_light"
-            android:textStyle="bold" android:paddingTop="16dp" android:paddingBottom="4dp" />
+        <!-- Hidden accent row (still needed by SettingsFragment references) -->
+        <View android:id="@+id/pref_accent_color"
+            android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone" />
 
-        <LinearLayout android:id="@+id/pref_speed"
-            android:layout_width="match_parent" android:layout_height="56dp"
-            android:orientation="horizontal" android:gravity="center_vertical"
-            android:paddingHorizontal="16dp" android:background="?attr/selectableItemBackground"
-            android:clickable="true" android:focusable="true">
-            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+        <!-- ── PLAYBACK ── -->
+        <TextView style="@style/SettingsSectionHeader" android:text="PLAYBACK" />
+
+        <!-- Speed -->
+        <LinearLayout android:id="@+id/pref_speed" style="@style/SettingsRow">
+            <LinearLayout style="@style/SettingsRowContent">
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Default Speed" android:textColor="@color/white" android:textSize="15sp" />
-                <TextView android:id="@+id/tv_speed_value" android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="1.0×" android:textColor="@color/on_surface_variant_dark" android:textSize="13sp" />
+                    android:text="Default Speed" style="@style/SettingsRowTitle" />
+                <TextView android:id="@+id/tv_speed_value"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="1.0×" style="@style/SettingsRowSub" />
             </LinearLayout>
         </LinearLayout>
 
-        <LinearLayout android:layout_width="match_parent" android:layout_height="56dp"
-            android:orientation="horizontal" android:gravity="center_vertical"
-            android:paddingHorizontal="16dp">
-            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+        <!-- Resume -->
+        <LinearLayout style="@style/SettingsRow">
+            <LinearLayout style="@style/SettingsRowContent">
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Resume Playback" android:textColor="@color/white" android:textSize="15sp" />
+                    android:text="Resume Playback" style="@style/SettingsRowTitle" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Continue where you left off" android:textColor="@color/on_surface_variant_dark" android:textSize="13sp" />
+                    android:text="Continue where you left off" style="@style/SettingsRowSub" />
             </LinearLayout>
             <androidx.appcompat.widget.SwitchCompat android:id="@+id/sw_resume"
                 android:layout_width="wrap_content" android:layout_height="wrap_content" />
         </LinearLayout>
 
-        <LinearLayout android:id="@+id/pref_skip"
-            android:layout_width="match_parent" android:layout_height="56dp"
-            android:orientation="horizontal" android:gravity="center_vertical"
-            android:paddingHorizontal="16dp" android:background="?attr/selectableItemBackground"
-            android:clickable="true" android:focusable="true">
-            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+        <!-- Skip -->
+        <LinearLayout android:id="@+id/pref_skip" style="@style/SettingsRow">
+            <LinearLayout style="@style/SettingsRowContent">
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Skip Interval" android:textColor="@color/white" android:textSize="15sp" />
-                <TextView android:id="@+id/tv_skip_value" android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="10 seconds" android:textColor="@color/on_surface_variant_dark" android:textSize="13sp" />
+                    android:text="Skip Interval" style="@style/SettingsRowTitle" />
+                <TextView android:id="@+id/tv_skip_value"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="10s" style="@style/SettingsRowSub" />
             </LinearLayout>
         </LinearLayout>
 
-        <!-- VIDEO -->
-        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="  VIDEO" android:textSize="11sp" android:textColor="@color/fp_purple_light"
-            android:textStyle="bold" android:paddingTop="16dp" android:paddingBottom="4dp" />
+        <!-- ── VIDEO ── -->
+        <TextView style="@style/SettingsSectionHeader" android:text="VIDEO" />
 
-        <LinearLayout android:layout_width="match_parent" android:layout_height="56dp"
-            android:orientation="horizontal" android:gravity="center_vertical"
-            android:paddingHorizontal="16dp">
-            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+        <LinearLayout style="@style/SettingsRow">
+            <LinearLayout style="@style/SettingsRowContent">
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Hardware Acceleration" android:textColor="@color/white" android:textSize="15sp" />
+                    android:text="Hardware Acceleration" style="@style/SettingsRowTitle" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Use GPU for video decoding" android:textColor="@color/on_surface_variant_dark" android:textSize="13sp" />
+                    android:text="Use GPU for decoding" style="@style/SettingsRowSub" />
             </LinearLayout>
             <androidx.appcompat.widget.SwitchCompat android:id="@+id/sw_hw_accel"
                 android:layout_width="wrap_content" android:layout_height="wrap_content" />
         </LinearLayout>
 
-        <LinearLayout android:layout_width="match_parent" android:layout_height="56dp"
-            android:orientation="horizontal" android:gravity="center_vertical"
-            android:paddingHorizontal="16dp">
-            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+        <LinearLayout style="@style/SettingsRow">
+            <LinearLayout style="@style/SettingsRowContent">
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Gesture Controls" android:textColor="@color/white" android:textSize="15sp" />
+                    android:text="Gesture Controls" style="@style/SettingsRowTitle" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Swipe for volume / brightness / seek" android:textColor="@color/on_surface_variant_dark" android:textSize="13sp" />
+                    android:text="Swipe for volume / brightness / seek" style="@style/SettingsRowSub" />
             </LinearLayout>
             <androidx.appcompat.widget.SwitchCompat android:id="@+id/sw_gestures"
                 android:layout_width="wrap_content" android:layout_height="wrap_content" />
         </LinearLayout>
 
-        <LinearLayout android:layout_width="match_parent" android:layout_height="56dp"
-            android:orientation="horizontal" android:gravity="center_vertical"
-            android:paddingHorizontal="16dp">
-            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+        <LinearLayout style="@style/SettingsRow">
+            <LinearLayout style="@style/SettingsRowContent">
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Remember Position" android:textColor="@color/white" android:textSize="15sp" />
+                    android:text="Remember Position" style="@style/SettingsRowTitle" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Resume video from last position" android:textColor="@color/on_surface_variant_dark" android:textSize="13sp" />
+                    android:text="Resume video from last position" style="@style/SettingsRowSub" />
             </LinearLayout>
             <androidx.appcompat.widget.SwitchCompat android:id="@+id/sw_remember_pos"
                 android:layout_width="wrap_content" android:layout_height="wrap_content" />
         </LinearLayout>
 
-        <!-- FOLDERS -->
-        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="  MEDIA FOLDERS" android:textSize="11sp" android:textColor="@color/fp_purple_light"
-            android:textStyle="bold" android:paddingTop="16dp" android:paddingBottom="4dp" />
+        <!-- ── MEDIA FOLDERS ── -->
+        <TextView style="@style/SettingsSectionHeader" android:text="MEDIA FOLDERS" />
 
-        <LinearLayout android:id="@+id/pref_audio_folders"
-            android:layout_width="match_parent" android:layout_height="56dp"
-            android:orientation="horizontal" android:gravity="center_vertical"
-            android:paddingHorizontal="16dp" android:background="?attr/selectableItemBackground"
-            android:clickable="true" android:focusable="true">
-            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+        <LinearLayout android:id="@+id/pref_audio_folders" style="@style/SettingsRow">
+            <LinearLayout style="@style/SettingsRowContent">
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Music Folders" android:textColor="@color/white" android:textSize="15sp" />
-                <TextView android:id="@+id/tv_audio_folders" android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="All folders" android:textColor="@color/on_surface_variant_dark" android:textSize="13sp" />
+                    android:text="Music Folders" style="@style/SettingsRowTitle" />
+                <TextView android:id="@+id/tv_audio_folders"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="All folders" style="@style/SettingsRowSub" />
             </LinearLayout>
         </LinearLayout>
 
-        <LinearLayout android:id="@+id/pref_video_folders"
-            android:layout_width="match_parent" android:layout_height="56dp"
-            android:orientation="horizontal" android:gravity="center_vertical"
-            android:paddingHorizontal="16dp" android:background="?attr/selectableItemBackground"
-            android:clickable="true" android:focusable="true">
-            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+        <LinearLayout android:id="@+id/pref_video_folders" style="@style/SettingsRow">
+            <LinearLayout style="@style/SettingsRowContent">
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Video Folders" android:textColor="@color/white" android:textSize="15sp" />
-                <TextView android:id="@+id/tv_video_folders" android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="All folders" android:textColor="@color/on_surface_variant_dark" android:textSize="13sp" />
+                    android:text="Video Folders" style="@style/SettingsRowTitle" />
+                <TextView android:id="@+id/tv_video_folders"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="All folders" style="@style/SettingsRowSub" />
             </LinearLayout>
         </LinearLayout>
 
-        <!-- ABOUT -->
-        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="  ABOUT" android:textSize="11sp" android:textColor="@color/fp_purple_light"
-            android:textStyle="bold" android:paddingTop="16dp" android:paddingBottom="4dp" />
+        <!-- ── DATA ── -->
+        <TextView style="@style/SettingsSectionHeader" android:text="DATA" />
 
-        <LinearLayout android:layout_width="match_parent" android:layout_height="56dp"
-            android:orientation="horizontal" android:gravity="center_vertical"
-            android:paddingHorizontal="16dp">
-            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Fountain Play" android:textColor="@color/white" android:textSize="15sp" />
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Version 1.0.0 — by FountainPDL" android:textColor="@color/on_surface_variant_dark" android:textSize="13sp" />
-            </LinearLayout>
-        </LinearLayout>
-
-
-        <!-- CLEAR HISTORY -->
-        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="  DATA" android:textSize="11sp" android:textColor="#BB86FC"
-            android:textStyle="bold" android:paddingTop="16dp" android:paddingBottom="4dp" />
-        <LinearLayout android:id="@+id/btn_clear_history"
-            android:layout_width="match_parent" android:layout_height="56dp"
-            android:orientation="horizontal" android:gravity="center_vertical"
-            android:paddingHorizontal="16dp" android:background="?attr/selectableItemBackground"
-            android:clickable="true" android:focusable="true">
+        <LinearLayout android:id="@+id/btn_clear_history" style="@style/SettingsRow">
             <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:text="Clear Play History" android:textColor="#EF5350" android:textSize="15sp" />
+                android:text="Clear Play History" android:textColor="#EF5350"
+                android:textSize="15sp" />
+        </LinearLayout>
+
+        <!-- ── ABOUT ── -->
+        <TextView style="@style/SettingsSectionHeader" android:text="ABOUT" />
+        <LinearLayout style="@style/SettingsRow">
+            <LinearLayout style="@style/SettingsRowContent">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Fountain Play" style="@style/SettingsRowTitle" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="v1.2 — by FountainPDL" style="@style/SettingsRowSub" />
+            </LinearLayout>
         </LinearLayout>
 
     </LinearLayout>

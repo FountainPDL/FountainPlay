@@ -1,70 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="64dp"
     android:orientation="horizontal"
     android:gravity="center_vertical"
     android:paddingHorizontal="12dp"
+    android:background="?attr/selectableItemBackground"
     android:clickable="true"
-    android:focusable="true"
-    android:background="?attr/selectableItemBackground">
+    android:focusable="true">
 
-    <!-- Album art -->
-    <ImageView
-        android:id="@+id/iv_album_art"
+    <ImageView android:id="@+id/iv_album_art"
         android:layout_width="46dp"
         android:layout_height="46dp"
         android:scaleType="centerCrop"
-        android:background="@color/surface_variant_dark" />
+        android:background="@color/fp_purple_dark" />
 
-    <!-- Title + Artist -->
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical"
+    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+        android:layout_weight="1" android:orientation="vertical"
         android:paddingHorizontal="12dp">
 
-        <TextView
-            android:id="@+id/tv_song_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:textStyle="bold"
+        <TextView android:id="@+id/tv_song_title"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
             android:textColor="?attr/colorOnSurface"
-            android:maxLines="1"
-            android:ellipsize="end" />
+            android:textSize="14sp" android:textStyle="bold"
+            android:maxLines="1" android:ellipsize="end" />
 
-        <TextView
-            android:id="@+id/tv_song_artist"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+        <TextView android:id="@+id/tv_song_artist"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:textColor="@color/on_surface_variant_dark"
             android:textSize="12sp"
-            android:textColor="?attr/colorOnSurface"
-            android:alpha="0.6"
-            android:maxLines="1"
-            android:ellipsize="end" />
+            android:maxLines="1" android:ellipsize="end" />
     </LinearLayout>
 
-    <!-- Duration -->
-    <TextView
-        android:id="@+id/tv_song_duration"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <TextView android:id="@+id/tv_song_duration"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:textColor="@color/on_surface_variant_dark"
         android:textSize="12sp"
-        android:textColor="?attr/colorOnSurface"
-        android:alpha="0.5"
         android:paddingEnd="4dp" />
 
-    <!-- More button -->
-    <ImageButton
-        android:id="@+id/btn_more"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+    <ImageButton android:id="@+id/btn_song_more"
+        android:layout_width="32dp" android:layout_height="32dp"
         android:src="@android:drawable/ic_menu_more"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:tint="?attr/colorOnSurface"
-        android:alpha="0.6" />
-
+        android:tint="@color/on_surface_variant_dark"
+        android:background="?attr/selectableItemBackgroundBorderless" />
 </LinearLayout>

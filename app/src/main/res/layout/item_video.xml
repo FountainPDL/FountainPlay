@@ -8,74 +8,50 @@
     android:clickable="true"
     android:focusable="true"
     app:cardCornerRadius="8dp"
-    app:cardElevation="2dp"
-    app:cardBackgroundColor="@color/surface_variant_dark">
+    app:cardBackgroundColor="@color/surface_variant_dark"
+    app:cardElevation="2dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Thumbnail -->
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="100dp">
-
-            <ImageView
-                android:id="@+id/iv_thumbnail"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+        <FrameLayout android:layout_width="match_parent" android:layout_height="110dp">
+            <ImageView android:id="@+id/iv_thumbnail"
+                android:layout_width="match_parent" android:layout_height="match_parent"
                 android:scaleType="centerCrop"
                 android:background="@color/surface_variant_dark" />
-
-            <!-- Play icon overlay -->
-            <ImageView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+            <ImageView android:layout_width="32dp" android:layout_height="32dp"
                 android:layout_gravity="center"
                 android:src="@android:drawable/ic_media_play"
-                android:tint="@color/white"
-                android:alpha="0.8" />
-
-            <!-- Duration badge -->
-            <TextView
-                android:id="@+id/tv_duration_badge"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:tint="#CCFFFFFF" />
+            <TextView android:id="@+id/tv_duration_badge"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:layout_gravity="bottom|end"
-                android:layout_margin="6dp"
-                android:textColor="@color/white"
-                android:textSize="11sp"
-                android:textStyle="bold"
+                android:layout_margin="5dp"
                 android:background="@color/overlay_dark"
-                android:paddingHorizontal="4dp"
-                android:paddingVertical="2dp" />
+                android:textColor="@color/white" android:textSize="11sp" android:textStyle="bold"
+                android:paddingHorizontal="5dp" android:paddingVertical="2dp" />
         </FrameLayout>
 
-        <!-- Title + size -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="8dp">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical"
+            android:paddingHorizontal="8dp" android:paddingVertical="6dp">
 
-            <TextView
-                android:id="@+id/tv_video_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:textColor="@color/on_surface_dark"
-                android:maxLines="2"
-                android:ellipsize="end" />
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:orientation="vertical">
+                <TextView android:id="@+id/tv_video_title"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:textColor="@color/white" android:textSize="13sp" android:textStyle="bold"
+                    android:maxLines="2" android:ellipsize="end" />
+                <TextView android:id="@+id/tv_video_info"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:textColor="@color/on_surface_variant_dark" android:textSize="11sp" />
+            </LinearLayout>
 
-            <TextView
-                android:id="@+id/tv_video_info"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="11sp"
-                android:textColor="@color/on_surface_variant_dark"
-                android:paddingTop="2dp" />
+            <ImageButton android:id="@+id/btn_video_more"
+                android:layout_width="30dp" android:layout_height="30dp"
+                android:src="@android:drawable/ic_menu_more"
+                android:tint="@color/on_surface_variant_dark"
+                android:background="?attr/selectableItemBackgroundBorderless" />
         </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

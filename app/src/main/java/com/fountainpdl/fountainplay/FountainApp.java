@@ -13,19 +13,26 @@ public class FountainApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        applyTheme(new AppPreferences(this).getTheme());
+        // Apply saved night/day mode on startup
+        applyNightMode(new AppPreferences(this).getTheme());
         createNotificationChannel();
     }
 
-    public static void applyTheme(String theme) {
+    /**
+     * Sets AppCompat night mode. AMOLED is handled per-activity via setTheme().
+     */
+    public static void applyNightMode(String theme) {
         switch (theme) {
             case "light":
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO); break;
-            case "amoled":
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                break;
             case "dark":
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES); break;
-            default:
+            case "amoled":
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                break;
+            default: // "system"
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+                break;
         }
     }
 

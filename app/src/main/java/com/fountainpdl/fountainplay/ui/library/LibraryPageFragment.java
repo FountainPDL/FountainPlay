@@ -16,6 +16,7 @@ import com.fountainpdl.fountainplay.db.entity.PlaylistEntity;
 import com.fountainpdl.fountainplay.db.entity.PlaylistSong;
 import com.fountainpdl.fountainplay.model.MediaItem;
 import com.fountainpdl.fountainplay.player.AudioPlayerActivity;
+import com.fountainpdl.fountainplay.player.VideoPlayerActivity;
 import com.fountainpdl.fountainplay.util.MediaScanner;
 import com.fountainpdl.fountainplay.util.PlayQueue;
 import java.util.*;
@@ -43,6 +44,7 @@ public class LibraryPageFragment extends Fragment {
 
         if (tab.equals("Playlists")) { loadPlaylists(rv, tvEmpty); return; }
         if (tab.equals("History"))   { loadHistory(rv, tvEmpty);   return; }
+        if (tab.equals("Videos"))    { loadVideos(rv, tvEmpty);    return; }
 
         List<MediaItem> items = new ArrayList<>();
         MediaAdapter adapter = new MediaAdapter(items, 0);
@@ -183,6 +185,30 @@ public class LibraryPageFragment extends Fragment {
                 i.putExtra(AudioPlayerActivity.EXTRA_TITLE, items.get(0).getTitle());
                 i.putExtra(AudioPlayerActivity.EXTRA_ARTIST, items.get(0).getArtist());
                 startActivity(i);
+            });
+        }).start();
+    }
+
+
+    private void loadVideos(RecyclerView rv, TextView tvEmpty) {
+        new Thread(() -> {
+            List<MediaItem> result = com.fountainpdl.fountainplay.util.MediaScanner
+                .scanVideo(requireContext());
+            requireActivity().runOnUiThread(() -> {
+                if (result.isEmpty()) {
+                    tvEmpty.setText("No videos found");
+                    tvEmpty.setVisibility(android.view.View.VISIBLE);
+                    return;
+                }
+                List<MediaItem> items = new java.util.ArrayList<>(result);
+                MediaAdapter adapter = new MediaAdapter(items, 1);
+                rv.setAdapter(adapter);
+                adapter.setOnItemClickListener((item, pos) -> {
+                    Intent i = new Intent(requireContext(), VideoPlayerActivity.class);
+                    i.putExtra(VideoPlayerActivity.EXTRA_URI, item.getPath());
+                    i.putExtra(VideoPlayerActivity.EXTRA_TITLE, item.getTitle());
+                    startActivity(i);
+                });
             });
         }).start();
     }

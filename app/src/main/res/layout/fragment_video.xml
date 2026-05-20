@@ -1,35 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent"
-    android:orientation="vertical" android:background="@color/background_dark">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="?attr/android:colorBackground">
 
+    <!-- Toolbar -->
     <LinearLayout android:layout_width="match_parent" android:layout_height="56dp"
         android:orientation="horizontal" android:gravity="center_vertical"
-        android:paddingHorizontal="8dp" android:background="@color/surface_dark">
+        android:paddingHorizontal="8dp"
+        android:background="?attr/colorSurface">
         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:text="Videos" android:textSize="20sp" android:textStyle="bold"
-            android:textColor="@color/white" android:paddingHorizontal="8dp" />
+            android:textColor="?attr/colorOnSurface" android:paddingHorizontal="8dp" />
         <TextView android:id="@+id/tv_video_count"
             android:layout_width="0dp" android:layout_height="wrap_content"
-            android:layout_weight="1" android:textColor="@color/on_surface_variant_dark" android:textSize="13sp" />
-        <ImageButton android:id="@+id/btn_sort_video"
+            android:layout_weight="1"
+            android:textColor="@color/on_surface_variant_dark" android:textSize="13sp" />
+        <ImageButton android:id="@+id/btn_toggle_layout"
             android:layout_width="40dp" android:layout_height="40dp"
             android:src="@android:drawable/ic_menu_sort_by_size"
-            android:tint="@color/white"
+            android:tint="?attr/colorOnSurface"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+        <ImageButton android:id="@+id/btn_sort_video"
+            android:layout_width="40dp" android:layout_height="40dp"
+            android:src="@android:drawable/ic_menu_agenda"
+            android:tint="?attr/colorOnSurface"
             android:background="?attr/selectableItemBackgroundBorderless" />
         <ImageButton android:id="@+id/btn_refresh_video"
             android:layout_width="40dp" android:layout_height="40dp"
             android:src="@android:drawable/ic_menu_rotate"
-            android:tint="@color/white"
+            android:tint="?attr/colorOnSurface"
             android:background="?attr/selectableItemBackgroundBorderless" />
     </LinearLayout>
 
+    <!-- Search -->
     <androidx.appcompat.widget.SearchView android:id="@+id/search_view_video"
         android:layout_width="match_parent" android:layout_height="48dp"
-        android:background="@color/surface_variant_dark" />
+        android:background="?attr/colorSurface" />
 
     <androidx.recyclerview.widget.RecyclerView android:id="@+id/rv_videos"
-        android:layout_width="match_parent" android:layout_height="0dp"
-        android:layout_weight="1" android:clipToPadding="false"
-        android:paddingHorizontal="4dp" android:paddingBottom="120dp" />
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingHorizontal="4dp"
+        android:paddingBottom="120dp" />
 </LinearLayout>

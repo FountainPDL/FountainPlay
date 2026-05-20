@@ -63,6 +63,8 @@ public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         notifyDataSetChanged();
     }
 
+    public void reverse() { Collections.reverse(items); notifyDataSetChanged(); }
+
     // ── Selection ──
     public void toggleSelection(int pos) {
         if (selected.contains(pos)) selected.remove(pos); else selected.add(pos);
@@ -124,6 +126,11 @@ public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 Glide.with(itemView).load(item.getAlbumArtUri()).centerCrop()
                     .placeholder(R.drawable.bg_play_button).into(art);
             else art.setImageResource(R.drawable.bg_play_button);
+            // wire ⋮ button to trigger long-press listener
+            android.widget.ImageButton more = itemView.findViewById(R.id.btn_song_more);
+            if (more != null) more.setOnClickListener(v -> {
+                if (longListener != null) longListener.onItemLong(item, getAdapterPosition(), itemView);
+            });
         }
     }
 
