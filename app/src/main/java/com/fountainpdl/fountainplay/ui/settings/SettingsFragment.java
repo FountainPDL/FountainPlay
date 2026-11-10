@@ -91,8 +91,9 @@ public class SettingsFragment extends Fragment {
                     prefs.setAccentColor(accent);
                     updateDot(primaryDot, primary);
                     updateDot(accentDot, accent);
+                    requireActivity().recreate();
                     Toast.makeText(requireContext(),
-                        "Color scheme applied — restart app to see all changes",
+                        "Color scheme applied",
                         Toast.LENGTH_SHORT).show();
                 }).show();
         });

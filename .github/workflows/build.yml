@@ -1,7 +1,7 @@
-name: Build Fountain Play APK
+name: Build APK
 on:
   push:
-    branches: [ main, dev ]
+    branches: [main]
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -9,13 +9,11 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: gradle
-      - run: chmod +x gradlew
-      - run: ./gradlew assembleDebug --stacktrace
+          distribution: temurin
+          java-version: 17
+      - uses: gradle/actions/setup-gradle@v4
+      - run: chmod +x gradlew && ./gradlew assembleDebug --stacktrace
       - uses: actions/upload-artifact@v4
         with:
-          name: FountainPlay-debug-${{ github.sha }}
+          name: FountainPlay-debug
           path: app/build/outputs/apk/debug/*.apk
-          retention-days: 30
