@@ -22,6 +22,7 @@ import com.fountainpdl.fountainplay.util.PlayQueue;
 import java.util.*;
 
 public class LibraryPageFragment extends Fragment {
+    private void runUiSafe(Runnable r) { android.app.Activity a = getActivity(); if (a != null && isAdded()) a.runOnUiThread(r); }
     private static final String ARG_TAB = "tab";
 
     public static LibraryPageFragment newInstance(String tab) {
@@ -68,7 +69,7 @@ public class LibraryPageFragment extends Fragment {
                 default:        result = all;               break;
             }
             final List<MediaItem> fr = result;
-            requireActivity().runOnUiThread(() -> {
+            runUiSafe(() -> {
                 items.clear(); items.addAll(fr); adapter.notifyDataSetChanged();
                 tvEmpty.setVisibility(items.isEmpty() ? View.VISIBLE : View.GONE);
             });
@@ -79,7 +80,7 @@ public class LibraryPageFragment extends Fragment {
         new Thread(() -> {
             List<com.fountainpdl.fountainplay.db.entity.HistoryItem> history =
                 AppDatabase.get(requireContext()).historyDao().getAll();
-            requireActivity().runOnUiThread(() -> {
+            runUiSafe(() -> {
                 if (history.isEmpty()) { tvEmpty.setText("No history yet"); tvEmpty.setVisibility(View.VISIBLE); return; }
                 List<MediaItem> items = new ArrayList<>();
                 for (com.fountainpdl.fountainplay.db.entity.HistoryItem h : history) {
@@ -103,7 +104,7 @@ public class LibraryPageFragment extends Fragment {
         new Thread(() -> {
             List<PlaylistEntity> playlists =
                 AppDatabase.get(requireContext()).playlistDao().getAllPlaylists();
-            requireActivity().runOnUiThread(() -> {
+            runUiSafe(() -> {
                 if (playlists.isEmpty()) {
                     tvEmpty.setText("No playlists yet.\nLong-press a song to create one.");
                     tvEmpty.setVisibility(View.VISIBLE);
@@ -126,7 +127,7 @@ public class LibraryPageFragment extends Fragment {
                             .setTitle("Delete \"" + p.name + "\"?")
                             .setPositiveButton("Delete", (d, i) -> new Thread(() -> {
                                 AppDatabase.get(requireContext()).playlistDao().deletePlaylist(p);
-                                requireActivity().runOnUiThread(() -> loadPlaylists(rv, tvEmpty));
+                                runUiSafe(() -> loadPlaylists(rv, tvEmpty));
                             }).start())
                             .setNegativeButton("Cancel", null).show();
                         return true;
@@ -158,7 +159,7 @@ public class LibraryPageFragment extends Fragment {
                     PlaylistEntity p = new PlaylistEntity();
                     p.name = name; p.createdAt = System.currentTimeMillis();
                     AppDatabase.get(requireContext()).playlistDao().insertPlaylist(p);
-                    requireActivity().runOnUiThread(() -> loadPlaylists(rv, tvEmpty));
+                    runUiSafe(() -> loadPlaylists(rv, tvEmpty));
                 }).start();
             }).setNegativeButton("Cancel", null).show();
     }
@@ -168,7 +169,7 @@ public class LibraryPageFragment extends Fragment {
             List<PlaylistSong> songs =
                 AppDatabase.get(requireContext()).playlistDao().getSongsForPlaylist(playlist.id);
             if (songs.isEmpty()) {
-                requireActivity().runOnUiThread(() ->
+                runUiSafe(() ->
                     Toast.makeText(requireContext(), "Playlist is empty", Toast.LENGTH_SHORT).show());
                 return;
             }
@@ -178,7 +179,7 @@ public class LibraryPageFragment extends Fragment {
                 m.setAlbumArtUri(s.albumArtUri);
                 items.add(m);
             }
-            requireActivity().runOnUiThread(() -> {
+            runUiSafe(() -> {
                 PlayQueue.get().setQueue(items, 0);
                 Intent i = new Intent(requireContext(), AudioPlayerActivity.class);
                 i.putExtra(AudioPlayerActivity.EXTRA_URI, items.get(0).getPath());
@@ -194,7 +195,7 @@ public class LibraryPageFragment extends Fragment {
         new Thread(() -> {
             List<MediaItem> result = com.fountainpdl.fountainplay.util.MediaScanner
                 .scanVideo(requireContext());
-            requireActivity().runOnUiThread(() -> {
+            runUiSafe(() -> {
                 if (result.isEmpty()) {
                     tvEmpty.setText("No videos found");
                     tvEmpty.setVisibility(android.view.View.VISIBLE);
@@ -205,6 +206,7 @@ public class LibraryPageFragment extends Fragment {
                 rv.setAdapter(adapter);
                 adapter.setOnItemClickListener((item, pos) -> {
                     Intent i = new Intent(requireContext(), VideoPlayerActivity.class);
+                    com.fountainpdl.fountainplay.util.VideoQueue.set(items, items.indexOf(item));
                     i.putExtra(VideoPlayerActivity.EXTRA_URI, item.getPath());
                     i.putExtra(VideoPlayerActivity.EXTRA_TITLE, item.getTitle());
                     startActivity(i);

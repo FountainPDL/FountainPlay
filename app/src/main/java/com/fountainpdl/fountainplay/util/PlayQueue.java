@@ -1,7 +1,10 @@
 package com.fountainpdl.fountainplay.util;
 
 import com.fountainpdl.fountainplay.model.MediaItem;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class PlayQueue {
     public static final int REPEAT_NONE = 0, REPEAT_ONE = 1, REPEAT_ALL = 2;
@@ -17,18 +20,25 @@ public class PlayQueue {
         void onQueueChanged();
         void onTrackChanged(MediaItem item, int index);
     }
-    private final List<Listener> listeners = new ArrayList<>();
+    private final List<Listener> listeners = new CopyOnWriteArrayList<>();
 
     private PlayQueue() {}
-    public static PlayQueue get() { if (instance == null) instance = new PlayQueue(); return instance; }
+    public static synchronized PlayQueue get() { if (instance == null) instance = new PlayQueue(); return instance; }
 
     public void setQueue(List<MediaItem> items, int startIndex) {
         original = new ArrayList<>(items);
         queue    = new ArrayList<>(items);
-        index    = startIndex;
+        index    = queue.isEmpty() ? 0 : Math.max(0, Math.min(startIndex, queue.size() - 1));
         if (shuffle) applyShuffleKeepCurrent();
         notifyQueueChanged();
         notifyTrackChanged();
+    }
+
+    public void clear() {
+        original = new ArrayList<>();
+        queue    = new ArrayList<>();
+        index    = 0;
+        notifyQueueChanged();
     }
 
     public void addToQueue(MediaItem item) {
@@ -37,18 +47,32 @@ public class PlayQueue {
         notifyQueueChanged();
     }
 
+    /** Plays right after the current track (also remembered when shuffle is switched off). */
     public void addNext(MediaItem item) {
+        MediaItem cur = current();
         int insertAt = index + 1;
         if (insertAt >= queue.size()) queue.add(item);
         else queue.add(insertAt, item);
+        int oi = cur == null ? -1 : original.indexOf(cur);
+        if (oi < 0 || oi + 1 >= original.size()) original.add(item);
+        else original.add(oi + 1, item);
         notifyQueueChanged();
     }
 
-    public MediaItem current() { return queue.isEmpty() ? null : queue.get(Math.max(0, Math.min(index, queue.size()-1))); }
+    public MediaItem current() {
+        return queue.isEmpty() ? null : queue.get(Math.max(0, Math.min(index, queue.size() - 1)));
+    }
 
+    /** Called when a track finishes by itself: honours repeat-one. */
+    public MediaItem advance() {
+        if (queue.isEmpty()) return null;
+        if (repeatMode == REPEAT_ONE) { notifyTrackChanged(); return current(); }
+        return next();
+    }
+
+    /** Called when the user presses Next. */
     public MediaItem next() {
         if (queue.isEmpty()) return null;
-        if (repeatMode == REPEAT_ONE) return current();
         if (index < queue.size() - 1) { index++; notifyTrackChanged(); return current(); }
         if (repeatMode == REPEAT_ALL) { index = 0; notifyTrackChanged(); return current(); }
         return null; // end of queue
@@ -57,20 +81,32 @@ public class PlayQueue {
     public MediaItem previous() {
         if (queue.isEmpty()) return null;
         if (index > 0) { index--; notifyTrackChanged(); return current(); }
-        if (repeatMode == REPEAT_ALL) { index = queue.size()-1; notifyTrackChanged(); return current(); }
+        if (repeatMode == REPEAT_ALL) { index = queue.size() - 1; notifyTrackChanged(); return current(); }
         return current();
     }
 
-    public boolean hasNext() {
-        return !queue.isEmpty() && (index < queue.size()-1 || repeatMode != REPEAT_NONE);
+    /** Jump straight to a position in the queue (tap in Up Next). */
+    public void jumpTo(int pos) {
+        if (pos < 0 || pos >= queue.size()) return;
+        index = pos;
+        notifyQueueChanged();
+        notifyTrackChanged();
     }
 
-    public boolean hasPrevious() { return index > 0; }
+    public boolean hasNext() {
+        return !queue.isEmpty() && (index < queue.size() - 1 || repeatMode == REPEAT_ALL);
+    }
+
+    public boolean hasPrevious() { return index > 0 || (repeatMode == REPEAT_ALL && queue.size() > 1); }
 
     public void setShuffle(boolean on) {
         shuffle = on;
         if (on) applyShuffleKeepCurrent();
-        else { MediaItem cur = current(); queue = new ArrayList<>(original); index = queue.indexOf(cur); }
+        else {
+            MediaItem cur = current();
+            queue = new ArrayList<>(original);
+            index = Math.max(0, queue.indexOf(cur));
+        }
         notifyQueueChanged();
     }
 
@@ -83,6 +119,7 @@ public class PlayQueue {
 
     public void cycleRepeat() {
         repeatMode = (repeatMode + 1) % 3;
+        notifyQueueChanged();
     }
 
     public boolean isShuffle() { return shuffle; }
@@ -103,14 +140,15 @@ public class PlayQueue {
 
     public void removeAt(int pos) {
         if (pos < 0 || pos >= queue.size()) return;
-        queue.remove(pos);
+        MediaItem removed = queue.remove(pos);
+        original.remove(removed);
         if (pos < index) index--;
-        else if (pos == index && index >= queue.size()) index = Math.max(0, queue.size()-1);
+        else if (pos == index && index >= queue.size()) index = Math.max(0, queue.size() - 1);
         notifyQueueChanged();
     }
 
     public void addListener(Listener l) { if (!listeners.contains(l)) listeners.add(l); }
     public void removeListener(Listener l) { listeners.remove(l); }
-    private void notifyQueueChanged() { for (Listener l : new ArrayList<>(listeners)) l.onQueueChanged(); }
-    private void notifyTrackChanged() { MediaItem cur = current(); for (Listener l : new ArrayList<>(listeners)) l.onTrackChanged(cur, index); }
+    private void notifyQueueChanged() { for (Listener l : listeners) l.onQueueChanged(); }
+    private void notifyTrackChanged() { MediaItem cur = current(); for (Listener l : listeners) l.onTrackChanged(cur, index); }
 }

@@ -20,6 +20,7 @@ import com.fountainpdl.fountainplay.util.*;
 import java.util.*;
 
 public class VideoFragment extends Fragment {
+    private void runUiSafe(Runnable r) { android.app.Activity a = getActivity(); if (a != null && isAdded()) a.runOnUiThread(r); }
 
     private MediaAdapter adapter;
     private final List<MediaItem> videos = new ArrayList<>();
@@ -46,6 +47,7 @@ public class VideoFragment extends Fragment {
 
         adapter.setOnItemClickListener((item, pos) -> {
             Intent i = new Intent(requireContext(), VideoPlayerActivity.class);
+            com.fountainpdl.fountainplay.util.VideoQueue.set(videos, videos.indexOf(item));
             i.putExtra(VideoPlayerActivity.EXTRA_URI, item.getPath());
             i.putExtra(VideoPlayerActivity.EXTRA_TITLE, item.getTitle());
             startActivity(i);
@@ -90,7 +92,7 @@ public class VideoFragment extends Fragment {
             Set<String> folders  = prefs.getVideoFolders();
             List<MediaItem> result = MediaScanner.scanVideo(
                 requireContext(), folders.isEmpty() ? null : folders);
-            requireActivity().runOnUiThread(() -> {
+            runUiSafe(() -> {
                 videos.clear(); videos.addAll(result);
                 adapter.updateAll(result);
                 tvCount.setText(videos.size() + " videos");
@@ -120,6 +122,7 @@ public class VideoFragment extends Fragment {
                 switch (i) {
                     case 0:
                         Intent intent = new Intent(requireContext(), VideoPlayerActivity.class);
+                        com.fountainpdl.fountainplay.util.VideoQueue.set(videos, videos.indexOf(item));
                         intent.putExtra(VideoPlayerActivity.EXTRA_URI, item.getPath());
                         intent.putExtra(VideoPlayerActivity.EXTRA_TITLE, item.getTitle());
                         startActivity(intent);
@@ -128,7 +131,7 @@ public class VideoFragment extends Fragment {
                     case 2:
                         Intent share = new Intent(Intent.ACTION_SEND);
                         share.setType("video/*");
-                        share.putExtra(Intent.EXTRA_STREAM, Uri.parse(item.getPath()));
+                        share.putExtra(Intent.EXTRA_STREAM, com.fountainpdl.fountainplay.util.MediaUris.contentUri(requireContext(), item)); share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         startActivity(Intent.createChooser(share,"Share"));
                         break;
                     case 3: showVideoInfo(item); break;
@@ -159,7 +162,7 @@ public class VideoFragment extends Fragment {
             s.duration = item.getDuration();
             db.playlistDao().insertSong(s);
             db.playlistDao().updateCount(fav.id);
-            requireActivity().runOnUiThread(()->
+            runUiSafe(()->
                 Toast.makeText(requireContext(),"Added to Favourites ⭐",Toast.LENGTH_SHORT).show());
         }).start();
     }
@@ -190,7 +193,7 @@ public class VideoFragment extends Fragment {
                 } catch (Exception ignored) {}
                 if (!ok) { java.io.File f = new java.io.File(item.getPath()); ok = f.exists() && f.delete(); }
                 final boolean success = ok;
-                requireActivity().runOnUiThread(() -> {
+                runUiSafe(() -> {
                     if (success) {
                         videos.remove(item);
                         adapter.updateAll(new ArrayList<>(videos));

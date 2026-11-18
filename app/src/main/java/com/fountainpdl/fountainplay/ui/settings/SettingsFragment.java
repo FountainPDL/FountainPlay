@@ -15,6 +15,7 @@ import com.fountainpdl.fountainplay.util.MediaScanner;
 import java.util.*;
 
 public class SettingsFragment extends Fragment {
+    private void runUiSafe(Runnable r) { android.app.Activity a = getActivity(); if (a != null && isAdded()) a.runOnUiThread(r); }
 
     private AppPreferences prefs;
 
@@ -160,7 +161,7 @@ public class SettingsFragment extends Fragment {
                 List<String> folders = isAudio
                     ? MediaScanner.getAudioFolders(requireContext())
                     : MediaScanner.getVideoFolders(requireContext());
-                requireActivity().runOnUiThread(() -> {
+                runUiSafe(() -> {
                     if (folders.isEmpty()) {
                         Toast.makeText(requireContext(), "No folders found", Toast.LENGTH_SHORT).show();
                         return;

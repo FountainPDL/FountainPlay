@@ -1,29 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/video_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#000000">
 
-    <!-- ExoPlayer surface -->
+    <!-- Video surface -->
     <androidx.media3.ui.PlayerView
         android:id="@+id/player_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:show_timeout="3000"
         app:resize_mode="fit"
         app:use_controller="false" />
 
-    <!-- Custom overlay (shows/hides on tap) -->
+    <!-- Always-present gesture surface (taps, swipes, double-tap). Stays active when controls are hidden. -->
+    <View
+        android:id="@+id/touch_layer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- Controls. Not clickable itself, so empty areas pass touches down to the gesture surface. -->
     <LinearLayout
         android:id="@+id/controls_overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:background="#66000000"
-        android:visibility="visible">
+        android:background="#66000000">
 
-        <!-- Top bar -->
+        <!-- Top bar: back | title | PiP | more -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="56dp"
@@ -34,6 +39,7 @@
             <ImageButton android:id="@+id/btn_back"
                 android:layout_width="44dp" android:layout_height="44dp"
                 android:src="@android:drawable/ic_media_previous"
+                android:contentDescription="Back"
                 android:tint="#FFFFFF"
                 android:background="?attr/selectableItemBackgroundBorderless" />
 
@@ -45,85 +51,113 @@
                 android:paddingHorizontal="8dp" />
 
             <ImageButton android:id="@+id/btn_pip"
-                android:layout_width="40dp" android:layout_height="40dp"
+                android:layout_width="44dp" android:layout_height="44dp"
                 android:src="@android:drawable/ic_menu_view"
-                android:tint="#FFFFFF"
-                android:background="?attr/selectableItemBackgroundBorderless" />
-
-            <ImageButton android:id="@+id/btn_lock"
-                android:layout_width="40dp" android:layout_height="40dp"
-                android:src="@android:drawable/ic_lock_idle_lock"
+                android:contentDescription="Picture in picture"
                 android:tint="#FFFFFF"
                 android:background="?attr/selectableItemBackgroundBorderless" />
 
             <ImageButton android:id="@+id/btn_more"
-                android:layout_width="40dp" android:layout_height="40dp"
+                android:layout_width="44dp" android:layout_height="44dp"
                 android:src="@android:drawable/ic_menu_more"
+                android:contentDescription="More"
                 android:tint="#FFFFFF"
                 android:background="?attr/selectableItemBackgroundBorderless" />
         </LinearLayout>
 
-        <!-- Spacer -->
         <View android:layout_width="match_parent" android:layout_height="0dp"
             android:layout_weight="1" />
 
-        <!-- Centre controls -->
+        <!-- Transport row: flexible spacers between fixed buttons, so it can never overlap -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center"
+            android:gravity="center_vertical"
             android:paddingBottom="8dp">
 
+            <Space android:layout_width="0dp" android:layout_height="1dp" android:layout_weight="1" />
             <ImageButton android:id="@+id/btn_prev_video"
-                android:layout_width="52dp" android:layout_height="52dp"
+                android:layout_width="44dp" android:layout_height="44dp"
                 android:src="@android:drawable/ic_media_previous"
+                android:contentDescription="Previous video"
                 android:tint="#FFFFFF"
                 android:background="?attr/selectableItemBackgroundBorderless" />
-
+            <Space android:layout_width="0dp" android:layout_height="1dp" android:layout_weight="1" />
             <ImageButton android:id="@+id/btn_rew"
-                android:layout_width="52dp" android:layout_height="52dp"
+                android:layout_width="44dp" android:layout_height="44dp"
                 android:src="@android:drawable/ic_media_rew"
+                android:contentDescription="Rewind"
                 android:tint="#FFFFFF"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:layout_marginHorizontal="8dp" />
-
+                android:background="?attr/selectableItemBackgroundBorderless" />
+            <Space android:layout_width="0dp" android:layout_height="1dp" android:layout_weight="1" />
             <ImageButton android:id="@+id/btn_play_video"
-                android:layout_width="64dp" android:layout_height="64dp"
+                android:layout_width="60dp" android:layout_height="60dp"
                 android:src="@android:drawable/ic_media_pause"
+                android:contentDescription="Play or pause"
                 android:tint="#FFFFFF"
                 android:background="@drawable/bg_play_button"
-                android:padding="14dp"
-                android:layout_marginHorizontal="8dp" />
-
+                android:padding="14dp" />
+            <Space android:layout_width="0dp" android:layout_height="1dp" android:layout_weight="1" />
             <ImageButton android:id="@+id/btn_ff"
-                android:layout_width="52dp" android:layout_height="52dp"
+                android:layout_width="44dp" android:layout_height="44dp"
                 android:src="@android:drawable/ic_media_ff"
-                android:tint="#FFFFFF"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:layout_marginHorizontal="8dp" />
-
-            <ImageButton android:id="@+id/btn_next_video"
-                android:layout_width="52dp" android:layout_height="52dp"
-                android:src="@android:drawable/ic_media_next"
+                android:contentDescription="Fast forward"
                 android:tint="#FFFFFF"
                 android:background="?attr/selectableItemBackgroundBorderless" />
+            <Space android:layout_width="0dp" android:layout_height="1dp" android:layout_weight="1" />
+            <ImageButton android:id="@+id/btn_next_video"
+                android:layout_width="44dp" android:layout_height="44dp"
+                android:src="@android:drawable/ic_media_next"
+                android:contentDescription="Next video"
+                android:tint="#FFFFFF"
+                android:background="?attr/selectableItemBackgroundBorderless" />
+            <Space android:layout_width="0dp" android:layout_height="1dp" android:layout_weight="1" />
         </LinearLayout>
 
-        <!-- Bottom bar: seek + time -->
+        <!-- Seek row -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingHorizontal="12dp"
-            android:paddingBottom="12dp">
-
-            <!-- Speed / Ratio / Subtitle / Audio chips -->
-            <HorizontalScrollView
-                android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="12dp">
+            <TextView android:id="@+id/tv_pos"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="0:00" android:textColor="#CCFFFFFF" android:textSize="12sp" />
+            <SeekBar android:id="@+id/video_seek_bar"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:scrollbars="none"
-                android:paddingBottom="6dp">
+                android:layout_weight="1"
+                android:progressTint="#BB86FC"
+                android:thumbTint="#FFFFFF"
+                android:max="1000" />
+            <TextView android:id="@+id/tv_dur"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="0:00" android:textColor="#CCFFFFFF" android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- Bottom row: lock | scrolling chips -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="8dp"
+            android:paddingBottom="8dp">
+
+            <ImageButton android:id="@+id/btn_lock"
+                android:layout_width="40dp" android:layout_height="40dp"
+                android:src="@android:drawable/ic_lock_idle_lock"
+                android:contentDescription="Lock controls"
+                android:tint="#FFFFFF"
+                android:background="?attr/selectableItemBackgroundBorderless" />
+
+            <HorizontalScrollView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:scrollbars="none">
                 <com.google.android.material.chip.ChipGroup
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
@@ -149,37 +183,28 @@
                         style="@style/Widget.Material3.Chip.Filter" />
                 </com.google.android.material.chip.ChipGroup>
             </HorizontalScrollView>
-
-            <!-- Seek bar -->
-            <SeekBar android:id="@+id/video_seek_bar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:progressTint="#BB86FC"
-                android:thumbTint="#FFFFFF"
-                android:max="1000" />
-
-            <!-- Time row -->
-            <LinearLayout android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingTop="2dp">
-                <TextView android:id="@+id/tv_pos"
-                    android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="0:00" android:textColor="#CCFFFFFF" android:textSize="12sp" />
-                <View android:layout_width="0dp" android:layout_height="1dp" android:layout_weight="1"/>
-                <TextView android:id="@+id/tv_dur"
-                    android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="0:00" android:textColor="#CCFFFFFF" android:textSize="12sp" />
-            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 
+    <!-- Shown only while locked: tap the screen, then tap this to unlock -->
+    <ImageButton android:id="@+id/btn_unlock"
+        android:layout_width="52dp" android:layout_height="52dp"
+        android:layout_gravity="start|center_vertical"
+        android:layout_marginStart="24dp"
+        android:src="@android:drawable/ic_lock_lock"
+        android:contentDescription="Unlock controls"
+        android:tint="#FFFFFF"
+        android:padding="12dp"
+        android:background="@drawable/bg_play_button"
+        android:visibility="gone" />
+
     <!-- Gesture feedback: left = brightness -->
     <LinearLayout android:id="@+id/overlay_left"
-        android:layout_width="72dp" android:layout_height="match_parent"
-        android:layout_gravity="start" android:gravity="center"
+        android:layout_width="72dp" android:layout_height="wrap_content"
+        android:layout_gravity="start|center_vertical" android:layout_marginStart="24dp"
+        android:gravity="center"
         android:orientation="vertical" android:visibility="invisible"
-        android:background="#55000000">
+        android:background="#88000000" android:padding="10dp">
         <TextView android:id="@+id/tv_brightness_label"
             android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:text="☀" android:textSize="20sp" android:textColor="#FFFFFF" />
@@ -190,10 +215,11 @@
 
     <!-- Gesture feedback: right = volume -->
     <LinearLayout android:id="@+id/overlay_right"
-        android:layout_width="72dp" android:layout_height="match_parent"
-        android:layout_gravity="end" android:gravity="center"
+        android:layout_width="72dp" android:layout_height="wrap_content"
+        android:layout_gravity="end|center_vertical" android:layout_marginEnd="24dp"
+        android:gravity="center"
         android:orientation="vertical" android:visibility="invisible"
-        android:background="#55000000">
+        android:background="#88000000" android:padding="10dp">
         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:text="🔊" android:textSize="20sp" android:textColor="#FFFFFF" />
         <TextView android:id="@+id/tv_volume_val"
@@ -201,7 +227,7 @@
             android:text="50%" android:textColor="#FFFFFF" android:textSize="12sp" />
     </LinearLayout>
 
-    <!-- Seek feedback: centre -->
+    <!-- Seek / double-tap feedback: centre -->
     <TextView android:id="@+id/tv_seek_indicator"
         android:layout_width="wrap_content" android:layout_height="wrap_content"
         android:layout_gravity="center"

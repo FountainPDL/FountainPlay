@@ -1,22 +1,53 @@
 plugins { id 'com.android.application' }
 
+// versionCode rises automatically with every GitHub Actions run, so every CI build installs over the last one.
+def ciRun = System.getenv("GITHUB_RUN_NUMBER")
+def fpVersionCode = ciRun ? (1000 + ciRun.toInteger()) : 1000
+
 android {
     namespace 'com.fountainpdl.fountainplay'
     compileSdk 34
+
+    // Committed debug keystore: every build (debug AND release) is signed with the same key,
+    // so a new APK always installs over the old one without uninstalling.
+    signingConfigs {
+        fixed {
+            storeFile file('debug.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
+    }
+
     defaultConfig {
         applicationId "com.fountainpdl.fountainplay"
         minSdk 26
         targetSdk 34
-        versionCode 3
-        versionName "1.2.0"
+        versionCode fpVersionCode
+        versionName "1.3.0"
     }
+
     buildTypes {
-        release { minifyEnabled false; proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro' }
+        debug {
+            signingConfig signingConfigs.fixed
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.fixed
+        }
     }
+
     buildFeatures { viewBinding true }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
+    }
+
+    lint {
+        abortOnError false
+        checkReleaseBuilds false
     }
 }
 
@@ -32,7 +63,7 @@ dependencies {
     implementation 'androidx.media3:media3-exoplayer-dash:1.2.1'
     implementation 'androidx.media3:media3-ui:1.2.1'
     implementation 'androidx.media3:media3-session:1.2.1'
-    // Media compat (for notification MediaStyle)
+    // Media compat
     implementation 'androidx.media:media:1.7.0'
     // Room
     implementation 'androidx.room:room-runtime:2.6.1'

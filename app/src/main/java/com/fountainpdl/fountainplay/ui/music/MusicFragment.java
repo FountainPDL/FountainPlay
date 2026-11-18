@@ -23,6 +23,7 @@ import com.fountainpdl.fountainplay.util.*;
 import java.util.*;
 
 public class MusicFragment extends Fragment {
+    private void runUiSafe(Runnable r) { android.app.Activity a = getActivity(); if (a != null && isAdded()) a.runOnUiThread(r); }
 
     private MediaAdapter adapter;
     private final List<MediaItem> songs = new ArrayList<>();
@@ -85,7 +86,7 @@ public class MusicFragment extends Fragment {
             Set<String> folders  = prefs.getAudioFolders();
             List<MediaItem> result = MediaScanner.scanAudio(
                 requireContext(), folders.isEmpty() ? null : folders);
-            requireActivity().runOnUiThread(() -> {
+            runUiSafe(() -> {
                 songs.clear();
                 songs.addAll(result);
                 adapter.updateAll(result);
@@ -158,7 +159,7 @@ public class MusicFragment extends Fragment {
         new Thread(() -> {
             List<PlaylistEntity> playlists =
                 AppDatabase.get(requireContext()).playlistDao().getAllPlaylists();
-            requireActivity().runOnUiThread(() -> {
+            runUiSafe(() -> {
                 if (playlists.isEmpty()) {
                     toast("No playlists — create one in Library");
                     return;
@@ -181,7 +182,7 @@ public class MusicFragment extends Fragment {
             s.duration = item.getDuration();
             AppDatabase.get(requireContext()).playlistDao().insertSong(s);
             AppDatabase.get(requireContext()).playlistDao().updateCount(playlist.id);
-            requireActivity().runOnUiThread(() -> toast("Added to " + playlist.name));
+            runUiSafe(() -> toast("Added to " + playlist.name));
         }).start();
     }
 
@@ -209,14 +210,14 @@ public class MusicFragment extends Fragment {
             s.duration = item.getDuration();
             AppDatabase.get(requireContext()).playlistDao().insertSong(s);
             AppDatabase.get(requireContext()).playlistDao().updateCount(fav.id);
-            requireActivity().runOnUiThread(() -> toast("Added to Favourites ⭐"));
+            runUiSafe(() -> toast("Added to Favourites ⭐"));
         }).start();
     }
 
     private void shareItem(MediaItem item) {
         Intent share = new Intent(Intent.ACTION_SEND);
         share.setType("audio/*");
-        share.putExtra(Intent.EXTRA_STREAM, Uri.parse(item.getPath()));
+        share.putExtra(Intent.EXTRA_STREAM, com.fountainpdl.fountainplay.util.MediaUris.contentUri(requireContext(), item)); share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         share.putExtra(Intent.EXTRA_TEXT, item.getTitle() + " - " + item.getArtist());
         startActivity(Intent.createChooser(share, "Share"));
     }
@@ -263,7 +264,7 @@ public class MusicFragment extends Fragment {
                 deleted = f.exists() && f.delete();
             }
             final boolean success = deleted;
-            requireActivity().runOnUiThread(() -> {
+            runUiSafe(() -> {
                 if (success) {
                     songs.remove(item);
                     adapter.updateAll(new ArrayList<>(songs));

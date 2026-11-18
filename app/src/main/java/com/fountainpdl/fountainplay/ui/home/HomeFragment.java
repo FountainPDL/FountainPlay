@@ -19,6 +19,7 @@ import java.util.Calendar;
 import java.util.List;
 
 public class HomeFragment extends Fragment {
+    private void runUiSafe(Runnable r) { android.app.Activity a = getActivity(); if (a != null && isAdded()) a.runOnUiThread(r); }
 
     @Nullable @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -51,7 +52,7 @@ public class HomeFragment extends Fragment {
             List<MediaItem> recentAudio = audio.size() > 10 ? audio.subList(0, 10) : audio;
             List<MediaItem> recentVideo = video.size() > 10 ? video.subList(0, 10) : video;
 
-            requireActivity().runOnUiThread(() -> {
+            runUiSafe(() -> {
                 rvRecentMusic.setAdapter(new MusicCardAdapter(recentAudio, item -> {
                     Intent i = new Intent(requireContext(), AudioPlayerActivity.class);
                     i.putExtra(AudioPlayerActivity.EXTRA_URI, item.getPath());
@@ -63,6 +64,7 @@ public class HomeFragment extends Fragment {
 
                 rvRecentVideos.setAdapter(new VideoCardAdapter(recentVideo, item -> {
                     Intent i = new Intent(requireContext(), VideoPlayerActivity.class);
+                    com.fountainpdl.fountainplay.util.VideoQueue.set(recentVideo, recentVideo.indexOf(item));
                     i.putExtra(VideoPlayerActivity.EXTRA_URI, item.getPath());
                     startActivity(i);
                 }));

@@ -2,6 +2,8 @@ name: Build Fountain Play APK
 on:
   push:
     branches: [ main, dev ]
+  pull_request:
+  workflow_dispatch:
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -13,9 +15,29 @@ jobs:
           distribution: 'temurin'
           cache: gradle
       - run: chmod +x gradlew
-      - run: ./gradlew assembleDebug --stacktrace
+      - name: Build debug APK
+        run: ./gradlew assembleDebug --stacktrace
+      - name: Build release APK
+        run: ./gradlew assembleRelease --stacktrace
+      - name: Unit tests
+        run: ./gradlew testDebugUnitTest --stacktrace
+      - name: Lint (report only)
+        run: ./gradlew lintDebug --stacktrace
+        continue-on-error: true
       - uses: actions/upload-artifact@v4
         with:
-          name: FountainPlay-debug-${{ github.sha }}
+          name: FountainPlay-debug-${{ github.run_number }}
           path: app/build/outputs/apk/debug/*.apk
           retention-days: 30
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FountainPlay-release-${{ github.run_number }}
+          path: app/build/outputs/apk/release/*.apk
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lint-report-${{ github.run_number }}
+          path: app/build/reports/lint-results-debug.html
+          retention-days: 7
+          if-no-files-found: ignore
