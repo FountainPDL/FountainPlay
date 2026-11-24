@@ -1,171 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/android:colorBackground">
+    android:orientation="vertical">
 
-    <LinearLayout
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingBottom="120dp">
+        android:paddingHorizontal="20dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="8dp"
+        android:text="Settings"
+        android:textAppearance="?attr/textAppearanceHeadlineMedium"
+        android:textColor="?attr/colorOnSurface"
+        android:textStyle="bold" />
 
-        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="Settings" android:textSize="26sp" android:textStyle="bold"
-            android:textColor="?attr/colorOnSurface" android:padding="16dp" />
-
-        <!-- ── APPEARANCE ── -->
-        <TextView style="@style/SettingsSectionHeader" android:text="APPEARANCE" />
-
-        <!-- Theme -->
-        <LinearLayout android:id="@+id/pref_theme" style="@style/SettingsRow">
-            <LinearLayout style="@style/SettingsRowContent">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Theme" style="@style/SettingsRowTitle" />
-                <TextView android:id="@+id/tv_theme_value" android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" android:text="Dark"
-                    style="@style/SettingsRowSub" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <!-- Color scheme -->
-        <LinearLayout android:id="@+id/pref_primary_color" style="@style/SettingsRow">
-            <LinearLayout style="@style/SettingsRowContent">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Color Scheme" style="@style/SettingsRowTitle" />
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Choose primary + accent colors"
-                    style="@style/SettingsRowSub" />
-            </LinearLayout>
-            <View android:id="@+id/color_preview_primary"
-                android:layout_width="28dp" android:layout_height="28dp"
-                android:background="@color/fp_purple"
-                android:layout_marginEnd="6dp" />
-            <View android:id="@+id/color_preview_accent"
-                android:layout_width="28dp" android:layout_height="28dp"
-                android:background="@color/fp_red" />
-        </LinearLayout>
-
-        <!-- Hidden accent row (still needed by SettingsFragment references) -->
-        <View android:id="@+id/pref_accent_color"
-            android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone" />
-
-        <!-- ── PLAYBACK ── -->
-        <TextView style="@style/SettingsSectionHeader" android:text="PLAYBACK" />
-
-        <!-- Speed -->
-        <LinearLayout android:id="@+id/pref_speed" style="@style/SettingsRow">
-            <LinearLayout style="@style/SettingsRowContent">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Default Speed" style="@style/SettingsRowTitle" />
-                <TextView android:id="@+id/tv_speed_value"
-                    android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="1.0×" style="@style/SettingsRowSub" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <!-- Resume -->
-        <LinearLayout style="@style/SettingsRow">
-            <LinearLayout style="@style/SettingsRowContent">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Resume Playback" style="@style/SettingsRowTitle" />
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Continue where you left off" style="@style/SettingsRowSub" />
-            </LinearLayout>
-            <androidx.appcompat.widget.SwitchCompat android:id="@+id/sw_resume"
-                android:layout_width="wrap_content" android:layout_height="wrap_content" />
-        </LinearLayout>
-
-        <!-- Skip -->
-        <LinearLayout android:id="@+id/pref_skip" style="@style/SettingsRow">
-            <LinearLayout style="@style/SettingsRowContent">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Skip Interval" style="@style/SettingsRowTitle" />
-                <TextView android:id="@+id/tv_skip_value"
-                    android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="10s" style="@style/SettingsRowSub" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <!-- ── VIDEO ── -->
-        <TextView style="@style/SettingsSectionHeader" android:text="VIDEO" />
-
-        <LinearLayout style="@style/SettingsRow">
-            <LinearLayout style="@style/SettingsRowContent">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Hardware Acceleration" style="@style/SettingsRowTitle" />
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Use GPU for decoding" style="@style/SettingsRowSub" />
-            </LinearLayout>
-            <androidx.appcompat.widget.SwitchCompat android:id="@+id/sw_hw_accel"
-                android:layout_width="wrap_content" android:layout_height="wrap_content" />
-        </LinearLayout>
-
-        <LinearLayout style="@style/SettingsRow">
-            <LinearLayout style="@style/SettingsRowContent">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Gesture Controls" style="@style/SettingsRowTitle" />
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Swipe for volume / brightness / seek" style="@style/SettingsRowSub" />
-            </LinearLayout>
-            <androidx.appcompat.widget.SwitchCompat android:id="@+id/sw_gestures"
-                android:layout_width="wrap_content" android:layout_height="wrap_content" />
-        </LinearLayout>
-
-        <LinearLayout style="@style/SettingsRow">
-            <LinearLayout style="@style/SettingsRowContent">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Remember Position" style="@style/SettingsRowTitle" />
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Resume video from last position" style="@style/SettingsRowSub" />
-            </LinearLayout>
-            <androidx.appcompat.widget.SwitchCompat android:id="@+id/sw_remember_pos"
-                android:layout_width="wrap_content" android:layout_height="wrap_content" />
-        </LinearLayout>
-
-        <!-- ── MEDIA FOLDERS ── -->
-        <TextView style="@style/SettingsSectionHeader" android:text="MEDIA FOLDERS" />
-
-        <LinearLayout android:id="@+id/pref_audio_folders" style="@style/SettingsRow">
-            <LinearLayout style="@style/SettingsRowContent">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Music Folders" style="@style/SettingsRowTitle" />
-                <TextView android:id="@+id/tv_audio_folders"
-                    android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="All folders" style="@style/SettingsRowSub" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout android:id="@+id/pref_video_folders" style="@style/SettingsRow">
-            <LinearLayout style="@style/SettingsRowContent">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Video Folders" style="@style/SettingsRowTitle" />
-                <TextView android:id="@+id/tv_video_folders"
-                    android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="All folders" style="@style/SettingsRowSub" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <!-- ── DATA ── -->
-        <TextView style="@style/SettingsSectionHeader" android:text="DATA" />
-
-        <LinearLayout android:id="@+id/btn_clear_history" style="@style/SettingsRow">
-            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:text="Clear Play History" android:textColor="#EF5350"
-                android:textSize="15sp" />
-        </LinearLayout>
-
-        <!-- ── ABOUT ── -->
-        <TextView style="@style/SettingsSectionHeader" android:text="ABOUT" />
-        <LinearLayout style="@style/SettingsRow">
-            <LinearLayout style="@style/SettingsRowContent">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="Fountain Play" style="@style/SettingsRowTitle" />
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="v1.2 — by FountainPDL" style="@style/SettingsRowSub" />
-            </LinearLayout>
-        </LinearLayout>
-
-    </LinearLayout>
-</androidx.core.widget.NestedScrollView>
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false">
+        <LinearLayout
+            android:id="@+id/settings_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="32dp" />
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

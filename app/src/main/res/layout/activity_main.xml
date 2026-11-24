@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="?attr/android:colorBackground">
+    android:background="?android:attr/colorBackground">
 
-    <!-- Fragment container takes all remaining height -->
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_host_fragment"
         android:name="androidx.navigation.fragment.NavHostFragment"
@@ -18,124 +16,122 @@
         app:defaultNavHost="true"
         app:navGraph="@navigation/nav_graph" />
 
-    <!-- Mini Player — above nav bar -->
-    <androidx.cardview.widget.CardView
+    <!-- Mini player -->
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/mini_player"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="8dp"
-        android:layout_marginBottom="4dp"
+        android:layout_marginHorizontal="10dp"
         android:layout_marginTop="4dp"
+        android:layout_marginBottom="6dp"
+        android:clickable="true"
+        android:focusable="true"
         android:visibility="gone"
-        app:cardCornerRadius="16dp"
-        app:cardBackgroundColor="@color/surface_dark"
-        app:cardElevation="12dp">
+        app:cardBackgroundColor="?attr/colorSecondaryContainer"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="2dp"
+        app:strokeWidth="0dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Thin progress bar -->
-            <ProgressBar android:id="@+id/mini_progress"
-                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:progressTint="@color/fp_purple"
-                android:progressBackgroundTint="@color/surface_variant_dark"
-                android:max="1000"
-                android:progress="0" />
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="64dp"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:paddingHorizontal="12dp">
+                android:paddingStart="10dp"
+                android:paddingEnd="4dp">
 
-                <!-- Album art -->
-                <androidx.cardview.widget.CardView
-                    android:layout_width="44dp"
-                    android:layout_height="44dp"
-                    app:cardCornerRadius="8dp"
-                    app:cardElevation="2dp">
-                    <ImageView android:id="@+id/mini_album_art"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:scaleType="centerCrop"
-                        android:background="@color/fp_purple_dark" />
-                </androidx.cardview.widget.CardView>
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/mini_album_art"
+                    android:layout_width="46dp"
+                    android:layout_height="46dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/bg_art_placeholder"
+                    app:shapeAppearanceOverlay="@style/ShapeAppearance.FP.Small" />
 
-                <!-- Title + artist -->
-                <LinearLayout android:layout_width="0dp"
+                <LinearLayout
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:orientation="vertical"
                     android:paddingHorizontal="12dp">
-                    <TextView android:id="@+id/mini_title"
+                    <TextView
+                        android:id="@+id/mini_title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Not playing"
-                        android:textColor="@color/white"
-                        android:textSize="13sp"
+                        android:textAppearance="?attr/textAppearanceTitleSmall"
+                        android:textColor="?attr/colorOnSecondaryContainer"
                         android:textStyle="bold"
                         android:maxLines="1"
                         android:ellipsize="end" />
-                    <TextView android:id="@+id/mini_artist"
+                    <TextView
+                        android:id="@+id/mini_artist"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="—"
-                        android:textColor="@color/on_surface_variant_dark"
-                        android:textSize="11sp"
+                        android:textAppearance="?attr/textAppearanceBodySmall"
+                        android:textColor="?attr/colorOnSecondaryContainer"
                         android:maxLines="1"
                         android:ellipsize="end" />
                 </LinearLayout>
 
-                <!-- Controls -->
-                <ImageButton android:id="@+id/mini_prev"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:src="@android:drawable/ic_media_previous"
-                    android:tint="@color/white"
+                <ImageButton
+                    android:id="@+id/mini_prev"
+                    android:layout_width="40dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/ic_skip_previous"
+                    android:contentDescription="Previous track"
+                    android:tooltipText="Previous track"
+                    app:tint="?attr/colorOnSecondaryContainer"
                     android:background="?attr/selectableItemBackgroundBorderless" />
 
-                <ImageButton android:id="@+id/mini_play_pause"
-                    android:layout_width="44dp"
-                    android:layout_height="44dp"
-                    android:src="@android:drawable/ic_media_play"
-                    android:tint="@color/white"
-                    android:background="@drawable/bg_mini_play"
-                    android:padding="10dp" />
-
-                <ImageButton android:id="@+id/mini_next"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:src="@android:drawable/ic_media_next"
-                    android:tint="@color/white"
+                <ImageButton
+                    android:id="@+id/mini_play_pause"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/ic_play"
+                    android:contentDescription="Play or pause"
+                    android:tooltipText="Play or pause"
+                    app:tint="?attr/colorOnSecondaryContainer"
                     android:background="?attr/selectableItemBackgroundBorderless" />
 
-                <ImageButton android:id="@+id/mini_close"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:src="@android:drawable/ic_menu_close_clear_cancel"
-                    android:tint="@color/on_surface_variant_dark"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:layout_marginStart="4dp" />
+                <ImageButton
+                    android:id="@+id/mini_next"
+                    android:layout_width="40dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/ic_skip_next"
+                    android:contentDescription="Next track"
+                    android:tooltipText="Next track"
+                    app:tint="?attr/colorOnSecondaryContainer"
+                    android:background="?attr/selectableItemBackgroundBorderless" />
+
+                <ImageButton
+                    android:id="@+id/mini_close"
+                    android:layout_width="40dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/ic_close"
+                    android:contentDescription="Stop and close player"
+                    android:tooltipText="Stop and close player"
+                    app:tint="?attr/colorOnSecondaryContainer"
+                    android:background="?attr/selectableItemBackgroundBorderless" />
             </LinearLayout>
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
 
-    <!-- Bottom navigation: natural height (the old fixed 56dp cut it off) -->
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/mini_progress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="1000"
+                app:trackThickness="3dp" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_nav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/surface_dark"
-        android:elevation="8dp"
-        app:menu="@menu/bottom_nav_menu"
-        app:itemIconTint="@color/nav_item_color"
-        app:itemTextColor="@color/nav_item_color"
-        app:labelVisibilityMode="labeled"
-        app:itemRippleColor="@color/fp_purple" />
+        app:menu="@menu/bottom_nav_menu" />
 
 </LinearLayout>

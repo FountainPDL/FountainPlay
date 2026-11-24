@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Colours used over video, set by the theme (never hard-coded in layouts) -->
+    <attr name="fpScrim" format="color" />
+    <attr name="fpOnScrim" format="color" />
+</resources>

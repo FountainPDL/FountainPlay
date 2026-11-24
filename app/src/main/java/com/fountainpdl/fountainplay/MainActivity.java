@@ -37,6 +37,7 @@ import com.fountainpdl.fountainplay.model.MediaItem;
 import com.fountainpdl.fountainplay.player.AudioPlayerActivity;
 import com.fountainpdl.fountainplay.service.PlaybackService;
 import com.fountainpdl.fountainplay.util.AppPreferences;
+import com.fountainpdl.fountainplay.util.LibraryRepo;
 import com.fountainpdl.fountainplay.util.PlaybackState;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.util.ArrayList;
@@ -87,6 +88,7 @@ public class MainActivity extends BaseActivity implements PlaybackState.Listener
         setupBackNavigation();
         setupMiniPlayer();
         mediaGrantedAtStart = hasMediaPermission();
+        if (mediaGrantedAtStart) LibraryRepo.get(this).ensureLoaded();
         requestPermissions();
         PlaybackState.get().addListener(this);
 
@@ -125,9 +127,12 @@ public class MainActivity extends BaseActivity implements PlaybackState.Listener
     private void setupBackNavigation() {
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override public void handleOnBackPressed() {
-                if (navController.getCurrentDestination() != null
-                        && navController.getCurrentDestination().getId() != R.id.nav_home) {
-                    bottomNav.setSelectedItemId(R.id.nav_home);
+                int dest = navController.getCurrentDestination() == null
+                    ? R.id.nav_home : navController.getCurrentDestination().getId();
+                if (dest == R.id.nav_history || dest == R.id.nav_manage_folders) {
+                    navController.popBackStack();                 // sub-screens go back to where they came from
+                } else if (dest != R.id.nav_home) {
+                    bottomNav.setSelectedItemId(R.id.nav_home);   // tabs go Home first
                 } else {
                     setEnabled(false);
                     getOnBackPressedDispatcher().onBackPressed();
@@ -170,7 +175,7 @@ public class MainActivity extends BaseActivity implements PlaybackState.Listener
         miniArtist.setText(item.getArtist());
         if (item.getAlbumArtUri() != null)
             Glide.with(this).load(item.getAlbumArtUri()).centerCrop()
-                .placeholder(R.drawable.bg_play_button).into(miniArt);
+                .placeholder(R.drawable.bg_art_placeholder).into(miniArt);
         if (miniCard.getVisibility() != View.VISIBLE) {
             miniCard.setAlpha(0f);
             miniCard.setTranslationY(40f);
@@ -188,7 +193,7 @@ public class MainActivity extends BaseActivity implements PlaybackState.Listener
 
     private void setPlayIcon(boolean playing) {
         miniPlay.setImageResource(playing
-            ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play);
+            ? R.drawable.ic_pause : R.drawable.ic_play);
     }
 
     @Override public void onItemChanged(MediaItem item) {
@@ -240,10 +245,10 @@ public class MainActivity extends BaseActivity implements PlaybackState.Listener
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        // Lists were scanned before access existed: rebuild the screens once access is granted.
+        // Lists were scanned before access existed: scan again now that access is granted.
         if (requestCode == PERM && !mediaGrantedAtStart && hasMediaPermission()) {
             mediaGrantedAtStart = true;
-            recreate();
+            LibraryRepo.get(this).refresh();
         }
     }
 

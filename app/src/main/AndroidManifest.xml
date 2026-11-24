@@ -32,7 +32,7 @@
             android:supportsPictureInPicture="true"
             android:resizeableActivity="true"
             android:exported="true"
-            android:theme="@style/Theme.FountainPlay.Player">
+            android:theme="@style/Theme.FountainPlay.Video">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />

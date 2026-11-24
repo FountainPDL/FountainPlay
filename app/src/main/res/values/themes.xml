@@ -1,55 +1,212 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <!-- ── Default (Dark) ── -->
-    <style name="Theme.FountainPlay" parent="Theme.Material3.Dark.NoActionBar">
-        <item name="colorPrimary">@color/fp_purple</item>
-        <item name="colorPrimaryVariant">@color/fp_purple_dark</item>
-        <item name="colorSecondary">@color/fp_red</item>
-        <item name="colorSurface">@color/surface_dark</item>
-        <item name="colorOnSurface">@color/on_surface_dark</item>
-        <item name="android:colorBackground">@color/background_dark</item>
-        <item name="android:windowBackground">@color/background_dark</item>
-        <item name="android:statusBarColor">@color/background_dark</item>
-        <item name="android:navigationBarColor">@color/surface_dark</item>
+    <style name="Theme.FountainPlay" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/fp_fountain_primary_light</item>
+        <item name="colorOnPrimary">@color/fp_fountain_onprimary_light</item>
+        <item name="colorPrimaryContainer">@color/fp_fountain_primarycontainer_light</item>
+        <item name="colorOnPrimaryContainer">@color/fp_fountain_onprimarycontainer_light</item>
+        <item name="colorSecondary">@color/fp_fountain_secondary_light</item>
+        <item name="colorOnSecondary">@color/fp_fountain_onsecondary_light</item>
+        <item name="colorSecondaryContainer">@color/fp_fountain_secondarycontainer_light</item>
+        <item name="colorOnSecondaryContainer">@color/fp_fountain_onsecondarycontainer_light</item>
+        <item name="colorTertiary">@color/fp_fountain_tertiary_light</item>
+        <item name="colorOnTertiary">@color/fp_fountain_ontertiary_light</item>
+        <item name="colorTertiaryContainer">@color/fp_fountain_tertiarycontainer_light</item>
+        <item name="colorOnTertiaryContainer">@color/fp_fountain_ontertiarycontainer_light</item>
+        <item name="colorSurface">@color/fp_fountain_surface_light</item>
+        <item name="colorOnSurface">@color/fp_fountain_onsurface_light</item>
+        <item name="colorSurfaceVariant">@color/fp_fountain_surfacevariant_light</item>
+        <item name="colorOnSurfaceVariant">@color/fp_fountain_onsurfacevariant_light</item>
+        <item name="colorOutline">@color/fp_fountain_outline_light</item>
+        <item name="colorOutlineVariant">@color/fp_fountain_outlinevariant_light</item>
+        <item name="colorSurfaceContainerLowest">@color/fp_fountain_surfacecontainerlowest_light</item>
+        <item name="colorSurfaceContainerLow">@color/fp_fountain_surfacecontainerlow_light</item>
+        <item name="colorSurfaceContainer">@color/fp_fountain_surfacecontainer_light</item>
+        <item name="colorSurfaceContainerHigh">@color/fp_fountain_surfacecontainerhigh_light</item>
+        <item name="colorSurfaceContainerHighest">@color/fp_fountain_surfacecontainerhighest_light</item>
+        <item name="colorSurfaceInverse">@color/fp_fountain_surfaceinverse_light</item>
+        <item name="colorOnSurfaceInverse">@color/fp_fountain_onsurfaceinverse_light</item>
+        <item name="android:colorBackground">@color/fp_fountain_surface_light</item>
+        <item name="colorOnBackground">@color/fp_fountain_onsurface_light</item>
+        <item name="android:windowBackground">@color/fp_fountain_surface_light</item>
+        <item name="android:statusBarColor">@color/fp_transparent</item>
+        <item name="android:navigationBarColor">@color/fp_transparent</item>
         <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.FP.Small</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.FP.Medium</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.FP.Large</item>
+        <item name="bottomNavigationStyle">@style/Widget.FP.BottomNav</item>
+        <item name="tabStyle">@style/Widget.FP.Tab</item>
+        <item name="fpScrim">@color/fp_video_scrim</item>
+        <item name="fpOnScrim">@color/fp_video_on_scrim</item>
     </style>
-
-    <!-- ── Light ── -->
-    <style name="Theme.FountainPlay.Light" parent="Theme.Material3.Light.NoActionBar">
-        <item name="colorPrimary">@color/fp_purple</item>
-        <item name="colorPrimaryVariant">@color/fp_purple_dark</item>
-        <item name="colorSecondary">@color/fp_red</item>
-        <item name="colorSurface">@color/surface_light</item>
-        <item name="colorOnSurface">@color/on_surface_light</item>
-        <item name="android:colorBackground">@color/background_light</item>
-        <item name="android:windowBackground">@color/background_light</item>
-        <item name="android:statusBarColor">@color/fp_purple_dark</item>
-        <item name="android:navigationBarColor">@color/surface_light</item>
-        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+    <style name="Theme.FountainPlay.Player" parent="Theme.FountainPlay" />
+    <style name="Theme.FountainPlay.Video" parent="Theme.FountainPlay">
+        <item name="android:windowBackground">@color/fp_video_black</item>
+        <item name="android:colorBackground">@color/fp_video_black</item>
     </style>
-
-    <!-- ── AMOLED (true black) ── -->
-    <style name="Theme.FountainPlay.AMOLED" parent="Theme.Material3.Dark.NoActionBar">
-        <item name="colorPrimary">@color/fp_purple_light</item>
-        <item name="colorPrimaryVariant">@color/fp_purple</item>
-        <item name="colorSecondary">@color/fp_red_light</item>
-        <item name="colorSurface">@color/surface_amoled</item>
-        <item name="colorOnSurface">@color/white</item>
-        <item name="android:colorBackground">@color/background_amoled</item>
-        <item name="android:windowBackground">@color/background_amoled</item>
-        <item name="android:statusBarColor">@color/background_amoled</item>
-        <item name="android:navigationBarColor">@color/background_amoled</item>
-        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+    <style name="ThemeOverlay.FP.Accent.Fountain" parent="">
+        <item name="colorPrimary">@color/fp_fountain_primary_light</item>
+        <item name="colorOnPrimary">@color/fp_fountain_onprimary_light</item>
+        <item name="colorPrimaryContainer">@color/fp_fountain_primarycontainer_light</item>
+        <item name="colorOnPrimaryContainer">@color/fp_fountain_onprimarycontainer_light</item>
+        <item name="colorSecondary">@color/fp_fountain_secondary_light</item>
+        <item name="colorOnSecondary">@color/fp_fountain_onsecondary_light</item>
+        <item name="colorSecondaryContainer">@color/fp_fountain_secondarycontainer_light</item>
+        <item name="colorOnSecondaryContainer">@color/fp_fountain_onsecondarycontainer_light</item>
+        <item name="colorTertiary">@color/fp_fountain_tertiary_light</item>
+        <item name="colorOnTertiary">@color/fp_fountain_ontertiary_light</item>
+        <item name="colorTertiaryContainer">@color/fp_fountain_tertiarycontainer_light</item>
+        <item name="colorOnTertiaryContainer">@color/fp_fountain_ontertiarycontainer_light</item>
+        <item name="colorSurface">@color/fp_fountain_surface_light</item>
+        <item name="colorOnSurface">@color/fp_fountain_onsurface_light</item>
+        <item name="colorSurfaceVariant">@color/fp_fountain_surfacevariant_light</item>
+        <item name="colorOnSurfaceVariant">@color/fp_fountain_onsurfacevariant_light</item>
+        <item name="colorOutline">@color/fp_fountain_outline_light</item>
+        <item name="colorOutlineVariant">@color/fp_fountain_outlinevariant_light</item>
+        <item name="colorSurfaceContainerLowest">@color/fp_fountain_surfacecontainerlowest_light</item>
+        <item name="colorSurfaceContainerLow">@color/fp_fountain_surfacecontainerlow_light</item>
+        <item name="colorSurfaceContainer">@color/fp_fountain_surfacecontainer_light</item>
+        <item name="colorSurfaceContainerHigh">@color/fp_fountain_surfacecontainerhigh_light</item>
+        <item name="colorSurfaceContainerHighest">@color/fp_fountain_surfacecontainerhighest_light</item>
+        <item name="colorSurfaceInverse">@color/fp_fountain_surfaceinverse_light</item>
+        <item name="colorOnSurfaceInverse">@color/fp_fountain_onsurfaceinverse_light</item>
     </style>
-
-    <!-- ── Player (always dark, translucent status) ── -->
-    <style name="Theme.FountainPlay.Player" parent="Theme.Material3.Dark.NoActionBar">
-        <item name="colorPrimary">@color/fp_purple</item>
-        <item name="android:windowBackground">@color/player_bg_dark</item>
-        <item name="android:statusBarColor">@color/transparent</item>
-        <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+    <style name="ThemeOverlay.FP.Accent.Ocean" parent="">
+        <item name="colorPrimary">@color/fp_ocean_primary_light</item>
+        <item name="colorOnPrimary">@color/fp_ocean_onprimary_light</item>
+        <item name="colorPrimaryContainer">@color/fp_ocean_primarycontainer_light</item>
+        <item name="colorOnPrimaryContainer">@color/fp_ocean_onprimarycontainer_light</item>
+        <item name="colorSecondary">@color/fp_ocean_secondary_light</item>
+        <item name="colorOnSecondary">@color/fp_ocean_onsecondary_light</item>
+        <item name="colorSecondaryContainer">@color/fp_ocean_secondarycontainer_light</item>
+        <item name="colorOnSecondaryContainer">@color/fp_ocean_onsecondarycontainer_light</item>
+        <item name="colorTertiary">@color/fp_ocean_tertiary_light</item>
+        <item name="colorOnTertiary">@color/fp_ocean_ontertiary_light</item>
+        <item name="colorTertiaryContainer">@color/fp_ocean_tertiarycontainer_light</item>
+        <item name="colorOnTertiaryContainer">@color/fp_ocean_ontertiarycontainer_light</item>
+        <item name="colorSurface">@color/fp_ocean_surface_light</item>
+        <item name="colorOnSurface">@color/fp_ocean_onsurface_light</item>
+        <item name="colorSurfaceVariant">@color/fp_ocean_surfacevariant_light</item>
+        <item name="colorOnSurfaceVariant">@color/fp_ocean_onsurfacevariant_light</item>
+        <item name="colorOutline">@color/fp_ocean_outline_light</item>
+        <item name="colorOutlineVariant">@color/fp_ocean_outlinevariant_light</item>
+        <item name="colorSurfaceContainerLowest">@color/fp_ocean_surfacecontainerlowest_light</item>
+        <item name="colorSurfaceContainerLow">@color/fp_ocean_surfacecontainerlow_light</item>
+        <item name="colorSurfaceContainer">@color/fp_ocean_surfacecontainer_light</item>
+        <item name="colorSurfaceContainerHigh">@color/fp_ocean_surfacecontainerhigh_light</item>
+        <item name="colorSurfaceContainerHighest">@color/fp_ocean_surfacecontainerhighest_light</item>
+        <item name="colorSurfaceInverse">@color/fp_ocean_surfaceinverse_light</item>
+        <item name="colorOnSurfaceInverse">@color/fp_ocean_onsurfaceinverse_light</item>
     </style>
-
+    <style name="ThemeOverlay.FP.Accent.Sunset" parent="">
+        <item name="colorPrimary">@color/fp_sunset_primary_light</item>
+        <item name="colorOnPrimary">@color/fp_sunset_onprimary_light</item>
+        <item name="colorPrimaryContainer">@color/fp_sunset_primarycontainer_light</item>
+        <item name="colorOnPrimaryContainer">@color/fp_sunset_onprimarycontainer_light</item>
+        <item name="colorSecondary">@color/fp_sunset_secondary_light</item>
+        <item name="colorOnSecondary">@color/fp_sunset_onsecondary_light</item>
+        <item name="colorSecondaryContainer">@color/fp_sunset_secondarycontainer_light</item>
+        <item name="colorOnSecondaryContainer">@color/fp_sunset_onsecondarycontainer_light</item>
+        <item name="colorTertiary">@color/fp_sunset_tertiary_light</item>
+        <item name="colorOnTertiary">@color/fp_sunset_ontertiary_light</item>
+        <item name="colorTertiaryContainer">@color/fp_sunset_tertiarycontainer_light</item>
+        <item name="colorOnTertiaryContainer">@color/fp_sunset_ontertiarycontainer_light</item>
+        <item name="colorSurface">@color/fp_sunset_surface_light</item>
+        <item name="colorOnSurface">@color/fp_sunset_onsurface_light</item>
+        <item name="colorSurfaceVariant">@color/fp_sunset_surfacevariant_light</item>
+        <item name="colorOnSurfaceVariant">@color/fp_sunset_onsurfacevariant_light</item>
+        <item name="colorOutline">@color/fp_sunset_outline_light</item>
+        <item name="colorOutlineVariant">@color/fp_sunset_outlinevariant_light</item>
+        <item name="colorSurfaceContainerLowest">@color/fp_sunset_surfacecontainerlowest_light</item>
+        <item name="colorSurfaceContainerLow">@color/fp_sunset_surfacecontainerlow_light</item>
+        <item name="colorSurfaceContainer">@color/fp_sunset_surfacecontainer_light</item>
+        <item name="colorSurfaceContainerHigh">@color/fp_sunset_surfacecontainerhigh_light</item>
+        <item name="colorSurfaceContainerHighest">@color/fp_sunset_surfacecontainerhighest_light</item>
+        <item name="colorSurfaceInverse">@color/fp_sunset_surfaceinverse_light</item>
+        <item name="colorOnSurfaceInverse">@color/fp_sunset_onsurfaceinverse_light</item>
+    </style>
+    <style name="ThemeOverlay.FP.Accent.Forest" parent="">
+        <item name="colorPrimary">@color/fp_forest_primary_light</item>
+        <item name="colorOnPrimary">@color/fp_forest_onprimary_light</item>
+        <item name="colorPrimaryContainer">@color/fp_forest_primarycontainer_light</item>
+        <item name="colorOnPrimaryContainer">@color/fp_forest_onprimarycontainer_light</item>
+        <item name="colorSecondary">@color/fp_forest_secondary_light</item>
+        <item name="colorOnSecondary">@color/fp_forest_onsecondary_light</item>
+        <item name="colorSecondaryContainer">@color/fp_forest_secondarycontainer_light</item>
+        <item name="colorOnSecondaryContainer">@color/fp_forest_onsecondarycontainer_light</item>
+        <item name="colorTertiary">@color/fp_forest_tertiary_light</item>
+        <item name="colorOnTertiary">@color/fp_forest_ontertiary_light</item>
+        <item name="colorTertiaryContainer">@color/fp_forest_tertiarycontainer_light</item>
+        <item name="colorOnTertiaryContainer">@color/fp_forest_ontertiarycontainer_light</item>
+        <item name="colorSurface">@color/fp_forest_surface_light</item>
+        <item name="colorOnSurface">@color/fp_forest_onsurface_light</item>
+        <item name="colorSurfaceVariant">@color/fp_forest_surfacevariant_light</item>
+        <item name="colorOnSurfaceVariant">@color/fp_forest_onsurfacevariant_light</item>
+        <item name="colorOutline">@color/fp_forest_outline_light</item>
+        <item name="colorOutlineVariant">@color/fp_forest_outlinevariant_light</item>
+        <item name="colorSurfaceContainerLowest">@color/fp_forest_surfacecontainerlowest_light</item>
+        <item name="colorSurfaceContainerLow">@color/fp_forest_surfacecontainerlow_light</item>
+        <item name="colorSurfaceContainer">@color/fp_forest_surfacecontainer_light</item>
+        <item name="colorSurfaceContainerHigh">@color/fp_forest_surfacecontainerhigh_light</item>
+        <item name="colorSurfaceContainerHighest">@color/fp_forest_surfacecontainerhighest_light</item>
+        <item name="colorSurfaceInverse">@color/fp_forest_surfaceinverse_light</item>
+        <item name="colorOnSurfaceInverse">@color/fp_forest_onsurfaceinverse_light</item>
+    </style>
+    <style name="ThemeOverlay.FP.Accent.Rose" parent="">
+        <item name="colorPrimary">@color/fp_rose_primary_light</item>
+        <item name="colorOnPrimary">@color/fp_rose_onprimary_light</item>
+        <item name="colorPrimaryContainer">@color/fp_rose_primarycontainer_light</item>
+        <item name="colorOnPrimaryContainer">@color/fp_rose_onprimarycontainer_light</item>
+        <item name="colorSecondary">@color/fp_rose_secondary_light</item>
+        <item name="colorOnSecondary">@color/fp_rose_onsecondary_light</item>
+        <item name="colorSecondaryContainer">@color/fp_rose_secondarycontainer_light</item>
+        <item name="colorOnSecondaryContainer">@color/fp_rose_onsecondarycontainer_light</item>
+        <item name="colorTertiary">@color/fp_rose_tertiary_light</item>
+        <item name="colorOnTertiary">@color/fp_rose_ontertiary_light</item>
+        <item name="colorTertiaryContainer">@color/fp_rose_tertiarycontainer_light</item>
+        <item name="colorOnTertiaryContainer">@color/fp_rose_ontertiarycontainer_light</item>
+        <item name="colorSurface">@color/fp_rose_surface_light</item>
+        <item name="colorOnSurface">@color/fp_rose_onsurface_light</item>
+        <item name="colorSurfaceVariant">@color/fp_rose_surfacevariant_light</item>
+        <item name="colorOnSurfaceVariant">@color/fp_rose_onsurfacevariant_light</item>
+        <item name="colorOutline">@color/fp_rose_outline_light</item>
+        <item name="colorOutlineVariant">@color/fp_rose_outlinevariant_light</item>
+        <item name="colorSurfaceContainerLowest">@color/fp_rose_surfacecontainerlowest_light</item>
+        <item name="colorSurfaceContainerLow">@color/fp_rose_surfacecontainerlow_light</item>
+        <item name="colorSurfaceContainer">@color/fp_rose_surfacecontainer_light</item>
+        <item name="colorSurfaceContainerHigh">@color/fp_rose_surfacecontainerhigh_light</item>
+        <item name="colorSurfaceContainerHighest">@color/fp_rose_surfacecontainerhighest_light</item>
+        <item name="colorSurfaceInverse">@color/fp_rose_surfaceinverse_light</item>
+        <item name="colorOnSurfaceInverse">@color/fp_rose_onsurfaceinverse_light</item>
+    </style>
+    <style name="ThemeOverlay.FP.Accent.Graphite" parent="">
+        <item name="colorPrimary">@color/fp_graphite_primary_light</item>
+        <item name="colorOnPrimary">@color/fp_graphite_onprimary_light</item>
+        <item name="colorPrimaryContainer">@color/fp_graphite_primarycontainer_light</item>
+        <item name="colorOnPrimaryContainer">@color/fp_graphite_onprimarycontainer_light</item>
+        <item name="colorSecondary">@color/fp_graphite_secondary_light</item>
+        <item name="colorOnSecondary">@color/fp_graphite_onsecondary_light</item>
+        <item name="colorSecondaryContainer">@color/fp_graphite_secondarycontainer_light</item>
+        <item name="colorOnSecondaryContainer">@color/fp_graphite_onsecondarycontainer_light</item>
+        <item name="colorTertiary">@color/fp_graphite_tertiary_light</item>
+        <item name="colorOnTertiary">@color/fp_graphite_ontertiary_light</item>
+        <item name="colorTertiaryContainer">@color/fp_graphite_tertiarycontainer_light</item>
+        <item name="colorOnTertiaryContainer">@color/fp_graphite_ontertiarycontainer_light</item>
+        <item name="colorSurface">@color/fp_graphite_surface_light</item>
+        <item name="colorOnSurface">@color/fp_graphite_onsurface_light</item>
+        <item name="colorSurfaceVariant">@color/fp_graphite_surfacevariant_light</item>
+        <item name="colorOnSurfaceVariant">@color/fp_graphite_onsurfacevariant_light</item>
+        <item name="colorOutline">@color/fp_graphite_outline_light</item>
+        <item name="colorOutlineVariant">@color/fp_graphite_outlinevariant_light</item>
+        <item name="colorSurfaceContainerLowest">@color/fp_graphite_surfacecontainerlowest_light</item>
+        <item name="colorSurfaceContainerLow">@color/fp_graphite_surfacecontainerlow_light</item>
+        <item name="colorSurfaceContainer">@color/fp_graphite_surfacecontainer_light</item>
+        <item name="colorSurfaceContainerHigh">@color/fp_graphite_surfacecontainerhigh_light</item>
+        <item name="colorSurfaceContainerHighest">@color/fp_graphite_surfacecontainerhighest_light</item>
+        <item name="colorSurfaceInverse">@color/fp_graphite_surfaceinverse_light</item>
+        <item name="colorOnSurfaceInverse">@color/fp_graphite_onsurfaceinverse_light</item>
+    </style>
+    <style name="ThemeOverlay.FP.Amoled" parent="">
+    </style>
 </resources>

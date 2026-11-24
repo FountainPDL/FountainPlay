@@ -1,12 +1,16 @@
 package com.fountainpdl.fountainplay.adapter;
 
-import android.view.*;
-import android.widget.*;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.fountainpdl.fountainplay.R;
 import com.fountainpdl.fountainplay.model.MediaItem;
+import com.fountainpdl.fountainplay.util.Fx;
 import java.util.List;
 
 public class QueueAdapter extends RecyclerView.Adapter<QueueAdapter.VH> {
@@ -20,7 +24,9 @@ public class QueueAdapter extends RecyclerView.Adapter<QueueAdapter.VH> {
     }
 
     @NonNull @Override public VH onCreateViewHolder(@NonNull ViewGroup p, int t) {
-        return new VH(LayoutInflater.from(p.getContext()).inflate(R.layout.item_queue, p, false));
+        View v = LayoutInflater.from(p.getContext()).inflate(R.layout.item_queue, p, false);
+        Fx.press(v);
+        return new VH(v);
     }
 
     @Override public void onBindViewHolder(@NonNull VH h, int pos) {
@@ -28,11 +34,13 @@ public class QueueAdapter extends RecyclerView.Adapter<QueueAdapter.VH> {
         h.num.setText(String.valueOf(pos + 1));
         h.title.setText(item.getTitle());
         h.artist.setText(item.getArtist());
-        h.dur.setText(item.getFormattedDuration());
+        h.dur.setText(item.getDuration() > 0 ? item.getFormattedDuration() : "");
         h.indicator.setVisibility(pos == currentIndex ? View.VISIBLE : View.GONE);
         h.num.setVisibility(pos == currentIndex ? View.GONE : View.VISIBLE);
         if (item.getAlbumArtUri() != null)
-            Glide.with(h.art.getContext()).load(item.getAlbumArtUri()).centerCrop().into(h.art);
+            Glide.with(h.art.getContext()).load(item.getAlbumArtUri()).centerCrop()
+                .placeholder(R.drawable.bg_art_placeholder).error(R.drawable.bg_art_placeholder).into(h.art);
+        else h.art.setImageResource(R.drawable.bg_art_placeholder);
         h.itemView.setAlpha(pos < currentIndex ? 0.5f : 1.0f);
         h.itemView.setOnClickListener(v -> click.onClick(item));
     }
@@ -40,8 +48,8 @@ public class QueueAdapter extends RecyclerView.Adapter<QueueAdapter.VH> {
     @Override public int getItemCount() { return items.size(); }
 
     static class VH extends RecyclerView.ViewHolder {
-        TextView num, title, artist, dur;
-        ImageView art, indicator;
+        final TextView num, title, artist, dur;
+        final ImageView art, indicator;
         VH(View v) {
             super(v);
             num = v.findViewById(R.id.tv_queue_num);

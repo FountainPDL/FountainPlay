@@ -6,16 +6,19 @@
     <fragment android:id="@+id/nav_home"
         android:name="com.fountainpdl.fountainplay.ui.home.HomeFragment"
         android:label="Home" />
-    <fragment android:id="@+id/nav_music"
-        android:name="com.fountainpdl.fountainplay.ui.music.MusicFragment"
-        android:label="Music" />
-    <fragment android:id="@+id/nav_video"
-        android:name="com.fountainpdl.fountainplay.ui.video.VideoFragment"
-        android:label="Video" />
     <fragment android:id="@+id/nav_library"
         android:name="com.fountainpdl.fountainplay.ui.library.LibraryFragment"
         android:label="Library" />
+    <fragment android:id="@+id/nav_search"
+        android:name="com.fountainpdl.fountainplay.ui.search.SearchFragment"
+        android:label="Search" />
     <fragment android:id="@+id/nav_settings"
         android:name="com.fountainpdl.fountainplay.ui.settings.SettingsFragment"
         android:label="Settings" />
+    <fragment android:id="@+id/nav_history"
+        android:name="com.fountainpdl.fountainplay.ui.history.HistoryFragment"
+        android:label="History" />
+    <fragment android:id="@+id/nav_manage_folders"
+        android:name="com.fountainpdl.fountainplay.ui.folders.ManageFoldersFragment"
+        android:label="Manage folders" />
 </navigation>

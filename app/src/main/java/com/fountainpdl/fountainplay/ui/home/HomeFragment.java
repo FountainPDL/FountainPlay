@@ -1,124 +1,183 @@
 package com.fountainpdl.fountainplay.ui.home;
 
-import android.content.Intent;
+import android.content.Context;
 import android.os.Bundle;
-import android.view.*;
-import android.widget.ImageView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
-import androidx.annotation.*;
+import android.widget.Toast;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.RecyclerView;
-import com.bumptech.glide.Glide;
 import com.fountainpdl.fountainplay.R;
+import com.fountainpdl.fountainplay.adapter.MediaCardAdapter;
 import com.fountainpdl.fountainplay.model.MediaItem;
-import com.fountainpdl.fountainplay.player.AudioPlayerActivity;
-import com.fountainpdl.fountainplay.player.VideoPlayerActivity;
-import com.fountainpdl.fountainplay.util.MediaScanner;
+import com.fountainpdl.fountainplay.util.Favourites;
+import com.fountainpdl.fountainplay.util.Fx;
+import com.fountainpdl.fountainplay.util.LibraryRepo;
+import com.fountainpdl.fountainplay.util.MediaLauncher;
+import com.fountainpdl.fountainplay.util.PlayQueue;
+import com.fountainpdl.fountainplay.util.ResumeStore;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class HomeFragment extends Fragment {
-    private void runUiSafe(Runnable r) { android.app.Activity a = getActivity(); if (a != null && isAdded()) a.runOnUiThread(r); }
+public class HomeFragment extends Fragment implements LibraryRepo.Listener {
+
+    private LibraryRepo repo;
+    private View sectionContinue, sectionVideos, sectionMusic, sectionFavs, emptyView, quickActions;
+    private RecyclerView rvContinue, rvVideos, rvMusic, rvFavs;
+    private TextView tvGreeting, tvSub;
+    private boolean animatedOnce = false;
+    private List<MediaItem> continueItems = new ArrayList<>();
 
     @Nullable @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_home, container, false);
+    public View onCreateView(@NonNull LayoutInflater inf, @Nullable ViewGroup c, @Nullable Bundle s) {
+        View v = inf.inflate(R.layout.fragment_home, c, false);
+        repo = LibraryRepo.get(requireContext());
+
+        tvGreeting = v.findViewById(R.id.tv_greeting);
+        tvSub = v.findViewById(R.id.tv_subgreeting);
+        sectionContinue = v.findViewById(R.id.section_continue);
+        sectionVideos = v.findViewById(R.id.section_videos);
+        sectionMusic = v.findViewById(R.id.section_music);
+        sectionFavs = v.findViewById(R.id.section_favs);
+        emptyView = v.findViewById(R.id.home_empty);
+        rvContinue = v.findViewById(R.id.rv_continue);
+        rvVideos = v.findViewById(R.id.rv_new_videos);
+        rvMusic = v.findViewById(R.id.rv_new_music);
+        rvFavs = v.findViewById(R.id.rv_favs);
+        quickActions = v.findViewById(R.id.btn_shuffle_all);
+
+        tvGreeting.setText(greeting());
+
+        v.findViewById(R.id.btn_home_menu).setOnClickListener(this::showMenu);
+        v.findViewById(R.id.btn_shuffle_all).setOnClickListener(x -> {
+            List<MediaItem> songs = repo.getAudio();
+            if (songs.isEmpty()) toast("No music found yet");
+            else MediaLauncher.shuffleAudio(requireContext(), songs);
+        });
+        v.findViewById(R.id.btn_resume).setOnClickListener(x -> resumeLast());
+        v.findViewById(R.id.btn_home_refresh).setOnClickListener(x -> {
+            repo.refresh();
+            toast("Refreshing…");
+        });
+        Fx.press(v.findViewById(R.id.btn_shuffle_all));
+        Fx.press(v.findViewById(R.id.btn_resume));
+        return v;
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    @Override public void onStart() {
+        super.onStart();
+        repo.addListener(this);
+        repo.ensureLoaded();
+        bind();
+    }
 
+    @Override public void onStop() {
+        super.onStop();
+        repo.removeListener(this);
+    }
+
+    @Override public void onLibraryChanged() { if (isAdded()) bind(); }
+
+    private String greeting() {
         int h = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
-        ((TextView)view.findViewById(R.id.tv_greeting)).setText(
-            h < 12 ? "Good morning ☀️" : h < 17 ? "Good afternoon 🎵" : "Good evening 🌙");
+        if (h >= 5 && h < 12) return "Good morning";
+        if (h >= 12 && h < 17) return "Good afternoon";
+        if (h >= 17 && h < 22) return "Good evening";
+        return "Good night";
+    }
 
-        RecyclerView rvRecentMusic = view.findViewById(R.id.rv_recent_music);
-        RecyclerView rvRecentVideos = view.findViewById(R.id.rv_recent_videos);
-        RecyclerView rvRecentPlayed = view.findViewById(R.id.rv_recently_played);
+    private void bind() {
+        final Context ctx = requireContext();
+        List<MediaItem> songs = repo.getAudio();
+        List<MediaItem> videos = repo.getVideo();
 
-        rvRecentMusic.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
-        rvRecentVideos.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
-        rvRecentPlayed.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
+        tvSub.setText(!repo.isLoaded() ? "Loading your library…"
+            : songs.isEmpty() && videos.isEmpty() ? "Let's find something to play"
+            : songs.size() + " songs · " + videos.size() + " videos");
 
+        // Continue watching: videos with a saved position
+        continueItems = new ArrayList<>();
+        ResumeStore store = new ResumeStore(ctx);
+        for (ResumeStore.Entry e : store.getRecent(12)) {
+            MediaItem match = null;
+            for (MediaItem m : videos) if (e.path.equals(m.getPath())) { match = m; break; }
+            if (match == null) {
+                match = new MediaItem(0, e.title, "", e.path, e.duration, MediaItem.TYPE_VIDEO);
+                if (!new java.io.File(e.path).exists()) continue;
+            }
+            continueItems.add(match);
+        }
+        setCarousel(sectionContinue, rvContinue, continueItems, true, true);
+        setCarousel(sectionVideos, rvVideos, head(videos, 12), true, false);
+        setCarousel(sectionMusic, rvMusic, head(songs, 12), false, false);
+
+        boolean empty = repo.isLoaded() && songs.isEmpty() && videos.isEmpty() && continueItems.isEmpty();
+        emptyView.setVisibility(empty ? View.VISIBLE : View.GONE);
+
+        loadFavourites();
+
+        if (!animatedOnce && repo.isLoaded()) {
+            animatedOnce = true;
+            ViewGroup content = (ViewGroup) requireView().findViewById(R.id.home_content);
+            Fx.enterChildren(content);
+        }
+    }
+
+    private void loadFavourites() {
+        final Context app = requireContext().getApplicationContext();
         new Thread(() -> {
-            List<MediaItem> audio = MediaScanner.scanAudio(requireContext());
-            List<MediaItem> video = MediaScanner.scanVideo(requireContext());
-
-            // Recently added = first 10 from date-sorted scan
-            List<MediaItem> recentAudio = audio.size() > 10 ? audio.subList(0, 10) : audio;
-            List<MediaItem> recentVideo = video.size() > 10 ? video.subList(0, 10) : video;
-
-            runUiSafe(() -> {
-                rvRecentMusic.setAdapter(new MusicCardAdapter(recentAudio, item -> {
-                    Intent i = new Intent(requireContext(), AudioPlayerActivity.class);
-                    i.putExtra(AudioPlayerActivity.EXTRA_URI, item.getPath());
-                    i.putExtra(AudioPlayerActivity.EXTRA_TITLE, item.getTitle());
-                    i.putExtra(AudioPlayerActivity.EXTRA_ARTIST, item.getArtist());
-                    i.putExtra(AudioPlayerActivity.EXTRA_ALBUM_ART, item.getAlbumArtUri());
-                    startActivity(i);
-                }));
-
-                rvRecentVideos.setAdapter(new VideoCardAdapter(recentVideo, item -> {
-                    Intent i = new Intent(requireContext(), VideoPlayerActivity.class);
-                    com.fountainpdl.fountainplay.util.VideoQueue.set(recentVideo, recentVideo.indexOf(item));
-                    i.putExtra(VideoPlayerActivity.EXTRA_URI, item.getPath());
-                    startActivity(i);
-                }));
-
-                // Recently played = same as recent audio for now (will improve with history)
-                rvRecentPlayed.setAdapter(new MusicCardAdapter(recentAudio, item -> {
-                    Intent i = new Intent(requireContext(), AudioPlayerActivity.class);
-                    i.putExtra(AudioPlayerActivity.EXTRA_URI, item.getPath());
-                    i.putExtra(AudioPlayerActivity.EXTRA_TITLE, item.getTitle());
-                    i.putExtra(AudioPlayerActivity.EXTRA_ARTIST, item.getArtist());
-                    i.putExtra(AudioPlayerActivity.EXTRA_ALBUM_ART, item.getAlbumArtUri());
-                    startActivity(i);
-                }));
+            final List<MediaItem> favs = Favourites.getAll(app);
+            if (getActivity() == null) return;
+            getActivity().runOnUiThread(() -> {
+                if (!isAdded()) return;
+                setCarousel(sectionFavs, rvFavs, favs, false, false);
             });
         }).start();
     }
 
-    // ── Inline Music Card Adapter ──
-    static class MusicCardAdapter extends RecyclerView.Adapter<MusicCardAdapter.VH> {
-        interface OnClick { void onClick(MediaItem item); }
-        final List<MediaItem> items; final OnClick click;
-        MusicCardAdapter(List<MediaItem> i, OnClick c) { items = i; click = c; }
-        @NonNull @Override public VH onCreateViewHolder(@NonNull ViewGroup p, int t) {
-            return new VH(LayoutInflater.from(p.getContext()).inflate(R.layout.item_home_music_card, p, false));
-        }
-        @Override public void onBindViewHolder(@NonNull VH h, int pos) { h.bind(items.get(pos)); h.itemView.setOnClickListener(v -> click.onClick(items.get(pos))); }
-        @Override public int getItemCount() { return items.size(); }
-        static class VH extends RecyclerView.ViewHolder {
-            ImageView art; TextView title, sub;
-            VH(View v) { super(v); art = v.findViewById(R.id.iv_card_art); title = v.findViewById(R.id.tv_card_title); sub = v.findViewById(R.id.tv_card_sub); }
-            void bind(MediaItem m) {
-                title.setText(m.getTitle()); sub.setText(m.getArtist());
-                Glide.with(itemView.getContext()).load(m.getAlbumArtUri()).centerCrop().placeholder(R.drawable.bg_play_button).into(art);
-            }
+    private void setCarousel(View section, RecyclerView rv, List<MediaItem> items, boolean video, boolean progress) {
+        if (items.isEmpty()) { section.setVisibility(View.GONE); return; }
+        section.setVisibility(View.VISIBLE);
+        rv.setAdapter(new MediaCardAdapter(items, video, progress,
+            (list, pos) -> MediaLauncher.open(requireContext(), list, pos)));
+    }
+
+    private static List<MediaItem> head(List<MediaItem> l, int n) {
+        return new ArrayList<>(l.subList(0, Math.min(n, l.size())));
+    }
+
+    private void resumeLast() {
+        if (!continueItems.isEmpty()) {
+            MediaLauncher.open(requireContext(), continueItems, 0);
+        } else if (PlayQueue.get().current() != null) {
+            startActivity(MediaLauncher.audioIntent(requireContext(), null));
+        } else {
+            toast("Nothing to resume yet");
         }
     }
 
-    // ── Inline Video Card Adapter ──
-    static class VideoCardAdapter extends RecyclerView.Adapter<VideoCardAdapter.VH> {
-        interface OnClick { void onClick(MediaItem item); }
-        final List<MediaItem> items; final OnClick click;
-        VideoCardAdapter(List<MediaItem> i, OnClick c) { items = i; click = c; }
-        @NonNull @Override public VH onCreateViewHolder(@NonNull ViewGroup p, int t) {
-            return new VH(LayoutInflater.from(p.getContext()).inflate(R.layout.item_home_video_card, p, false));
-        }
-        @Override public void onBindViewHolder(@NonNull VH h, int pos) { h.bind(items.get(pos)); h.itemView.setOnClickListener(v -> click.onClick(items.get(pos))); }
-        @Override public int getItemCount() { return items.size(); }
-        static class VH extends RecyclerView.ViewHolder {
-            ImageView thumb; TextView title, duration;
-            VH(View v) { super(v); thumb = v.findViewById(R.id.iv_card_thumb); title = v.findViewById(R.id.tv_card_title); duration = v.findViewById(R.id.tv_card_duration); }
-            void bind(MediaItem m) {
-                title.setText(m.getTitle()); duration.setText(m.getFormattedDuration());
-                Glide.with(itemView.getContext()).load(m.getPath()).centerCrop().placeholder(R.drawable.bg_play_button).into(thumb);
+    private void showMenu(View anchor) {
+        PopupMenu pm = new PopupMenu(requireContext(), anchor);
+        pm.getMenu().add(0, 1, 0, "History");
+        pm.getMenu().add(0, 2, 1, "Manage folders");
+        pm.getMenu().add(0, 3, 2, "Refresh library");
+        pm.setOnMenuItemClickListener(mi -> {
+            switch (mi.getItemId()) {
+                case 1: NavHostFragment.findNavController(this).navigate(R.id.nav_history); break;
+                case 2: NavHostFragment.findNavController(this).navigate(R.id.nav_manage_folders); break;
+                case 3: repo.refresh(); toast("Refreshing…"); break;
             }
-        }
+            return true;
+        });
+        pm.show();
     }
+
+    private void toast(String m) { Toast.makeText(requireContext(), m, Toast.LENGTH_SHORT).show(); }
 }

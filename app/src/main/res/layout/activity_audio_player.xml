@@ -1,182 +1,410 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/audio_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/player_bg_dark">
+    android:background="?attr/colorSurface">
 
-    <!-- Dynamic blurred background art -->
-    <ImageView android:id="@+id/iv_bg_blur"
-        android:layout_width="match_parent" android:layout_height="match_parent"
-        android:scaleType="centerCrop" android:alpha="0.18"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+    <!-- Colour wash taken from the album art at runtime -->
+    <View
+        android:id="@+id/bg_gradient"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
-    <View android:layout_width="match_parent" android:layout_height="match_parent"
-        android:background="@drawable/gradient_player_overlay"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <!-- Top bar -->
-    <LinearLayout android:id="@+id/top_bar"
-        android:layout_width="match_parent" android:layout_height="56dp"
-        android:orientation="horizontal" android:gravity="center_vertical"
-        android:paddingHorizontal="4dp"
-        app:layout_constraintTop_toTopOf="parent">
+        <LinearLayout
+            android:id="@+id/top_bar"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="8dp">
 
-        <ImageButton android:id="@+id/btn_back"
-            android:layout_width="48dp" android:layout_height="48dp"
-            android:src="@android:drawable/ic_media_previous"
-            android:tint="@color/white"
-            android:background="?attr/selectableItemBackgroundBorderless" />
-
-        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-            android:layout_weight="1" android:orientation="vertical" android:gravity="center">
-            <TextView android:id="@+id/tv_queue_info"
-                android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="Now Playing" android:textColor="@color/white"
-                android:textSize="11sp" android:alpha="0.6" />
-        </LinearLayout>
-
-        <ImageButton android:id="@+id/btn_options"
-            android:layout_width="48dp" android:layout_height="48dp"
-            android:src="@android:drawable/ic_menu_more"
-            android:tint="@color/white"
-            android:background="?attr/selectableItemBackgroundBorderless" />
-    </LinearLayout>
-
-    <!-- ViewPager2 for pages -->
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/view_pager"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/top_bar"
-        app:layout_constraintBottom_toTopOf="@id/page_indicator"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <!-- Page dots indicator -->
-    <LinearLayout android:id="@+id/page_indicator"
-        android:layout_width="wrap_content" android:layout_height="24dp"
-        android:orientation="horizontal" android:gravity="center"
-        app:layout_constraintBottom_toTopOf="@id/bottom_controls"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-        <View android:id="@+id/dot0" android:layout_width="6dp" android:layout_height="6dp"
-            android:layout_margin="3dp" android:background="@color/fp_purple" />
-        <View android:id="@+id/dot1" android:layout_width="6dp" android:layout_height="6dp"
-            android:layout_margin="3dp" android:background="@color/on_surface_variant_dark" />
-        <View android:id="@+id/dot2" android:layout_width="6dp" android:layout_height="6dp"
-            android:layout_margin="3dp" android:background="@color/on_surface_variant_dark" />
-    </LinearLayout>
-
-    <!-- BOTTOM CONTROLS — always visible -->
-    <LinearLayout android:id="@+id/bottom_controls"
-        android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingHorizontal="24dp" android:paddingBottom="24dp"
-        app:layout_constraintBottom_toBottomOf="parent">
-
-        <!-- Song info -->
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:orientation="horizontal" android:gravity="center_vertical"
-            android:paddingBottom="12dp">
-            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:orientation="vertical">
-                <TextView android:id="@+id/tv_title"
-                    android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:textColor="@color/white" android:textSize="20sp" android:textStyle="bold"
-                    android:maxLines="1" android:ellipsize="marquee"
-                    android:marqueeRepeatLimit="marquee_forever" android:focusable="true" />
-                <TextView android:id="@+id/tv_artist"
-                    android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:textColor="@color/on_surface_variant_dark" android:textSize="14sp"
-                    android:maxLines="1" android:ellipsize="end" />
+            <LinearLayout
+                android:id="@+id/btn_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="4dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="Minimise player"
+                android:tooltipText="Minimise player">
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/ic_expand_more"
+                    app:tint="?attr/colorOnSurface" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Close"
+                    android:textAppearance="?attr/textAppearanceLabelSmall"
+                    android:textColor="?attr/colorOnSurfaceVariant" />
             </LinearLayout>
-            <ImageButton android:id="@+id/btn_favorite"
-                android:layout_width="40dp" android:layout_height="40dp"
-                android:src="@android:drawable/btn_star_big_off"
-                android:tint="@color/on_surface_variant_dark"
-                android:background="?attr/selectableItemBackgroundBorderless" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="NOW PLAYING"
+                    android:textAppearance="?attr/textAppearanceLabelSmall"
+                    android:textColor="?attr/colorOnSurfaceVariant" />
+                <TextView
+                    android:id="@+id/tv_queue_info"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?attr/textAppearanceTitleSmall"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/btn_options"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="4dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="More options"
+                android:tooltipText="More options">
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/ic_more_vert"
+                    app:tint="?attr/colorOnSurface" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="More"
+                    android:textAppearance="?attr/textAppearanceLabelSmall"
+                    android:textColor="?attr/colorOnSurfaceVariant" />
+            </LinearLayout>
         </LinearLayout>
 
-        <!-- Seek bar -->
-        <SeekBar android:id="@+id/seek_bar"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:progressTint="@color/fp_purple_light"
-            android:thumbTint="@color/white"
-            android:progressBackgroundTint="@color/surface_variant_dark"
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/view_pager"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:paddingVertical="6dp">
+            <View android:id="@+id/dot0" android:layout_width="8dp" android:layout_height="8dp"
+                android:layout_marginHorizontal="4dp" android:background="@drawable/bg_dot" />
+            <View android:id="@+id/dot1" android:layout_width="8dp" android:layout_height="8dp"
+                android:layout_marginHorizontal="4dp" android:background="@drawable/bg_dot" />
+            <View android:id="@+id/dot2" android:layout_width="8dp" android:layout_height="8dp"
+                android:layout_marginHorizontal="4dp" android:background="@drawable/bg_dot" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="24dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="4dp">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/tv_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?attr/textAppearanceHeadlineSmall"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textStyle="bold"
+                    android:singleLine="true"
+                    android:ellipsize="marquee"
+                    android:marqueeRepeatLimit="marquee_forever" />
+                <TextView
+                    android:id="@+id/tv_artist"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?attr/textAppearanceBodyLarge"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:maxLines="1"
+                    android:ellipsize="end" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/btn_favorite"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="4dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="Like"
+                android:tooltipText="Add to Favourites">
+                <ImageView
+                    android:id="@+id/iv_favorite"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/ic_favorite_border"
+                    app:tint="?attr/colorOnSurfaceVariant" />
+                <TextView
+                    android:id="@+id/tv_favorite_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Like"
+                    android:textAppearance="?attr/textAppearanceLabelSmall"
+                    android:textColor="?attr/colorOnSurfaceVariant" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <SeekBar
+            android:id="@+id/seek_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:paddingHorizontal="22dp"
             android:max="1000" />
 
-        <!-- Time row -->
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:orientation="horizontal" android:paddingTop="2dp" android:paddingBottom="8dp">
-            <TextView android:id="@+id/tv_current_time"
-                android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="0:00" android:textColor="@color/on_surface_variant_dark" android:textSize="12sp" />
-            <View android:layout_width="0dp" android:layout_height="1dp" android:layout_weight="1" />
-            <TextView android:id="@+id/tv_total_time"
-                android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="0:00" android:textColor="@color/on_surface_variant_dark" android:textSize="12sp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingHorizontal="24dp">
+            <TextView
+                android:id="@+id/tv_current_time"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="0:00"
+                android:textAppearance="?attr/textAppearanceLabelMedium"
+                android:textColor="?attr/colorOnSurfaceVariant" />
+            <TextView
+                android:id="@+id/tv_total_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0:00"
+                android:textAppearance="?attr/textAppearanceLabelMedium"
+                android:textColor="?attr/colorOnSurfaceVariant" />
         </LinearLayout>
 
-        <!-- Main controls -->
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:orientation="horizontal" android:gravity="center" android:paddingBottom="8dp">
+        <LinearLayout
+            android:id="@+id/bottom_controls"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="8dp"
+            android:paddingTop="6dp"
+            android:paddingBottom="12dp">
 
-            <ImageButton android:id="@+id/btn_shuffle"
-                android:layout_width="44dp" android:layout_height="44dp"
-                android:src="@android:drawable/ic_menu_sort_by_size"
-                android:tint="@color/on_surface_variant_dark"
-                android:background="?attr/selectableItemBackgroundBorderless" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+            <LinearLayout
+                android:id="@+id/btn_shuffle"
+                style="@style/FP.ActionButton"
+                android:contentDescription="Shuffle"
+                android:tooltipText="Shuffle">
+                <ImageView
+                    android:id="@+id/iv_shuffle"
+                    style="@style/FP.ActionIcon"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:src="@drawable/ic_shuffle" />
+                <TextView
+                    android:id="@+id/tv_shuffle_label"
+                    style="@style/FP.ActionLabel"
+                    android:text="Shuffle" />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/btn_prev"
+                style="@style/FP.ActionButton"
+                android:contentDescription="Previous track"
+                android:tooltipText="Previous track">
+                <ImageView
+                    android:id="@+id/iv_prev"
+                    style="@style/FP.ActionIcon"
+                    android:layout_width="34dp"
+                    android:layout_height="34dp"
+                    android:src="@drawable/ic_skip_previous" />
+                <TextView
+                    android:id="@+id/tv_prev_label"
+                    style="@style/FP.ActionLabel"
+                    android:text="Previous" />
+            </LinearLayout>
 
-            <ImageButton android:id="@+id/btn_prev"
-                android:layout_width="52dp" android:layout_height="52dp"
-                android:src="@android:drawable/ic_media_previous"
-                android:tint="@color/white"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:layout_marginHorizontal="8dp" />
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.3"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal">
+                    <FrameLayout
+                        android:layout_width="72dp"
+                        android:layout_height="72dp"
+                        android:background="@drawable/bg_play_circle">
+                        <ImageButton
+                            android:id="@+id/btn_play_pause"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/ic_play"
+                            android:contentDescription="Play or pause"
+                            android:tooltipText="Play or pause"
+                            android:padding="18dp"
+                            app:tint="?attr/colorOnPrimary"
+                            android:background="?attr/selectableItemBackgroundBorderless" />
+                    </FrameLayout>
+                    <TextView
+                        android:id="@+id/tv_play_label"
+                        style="@style/FP.ActionLabel"
+                        android:text="Play" />
+                </LinearLayout>
+            <LinearLayout
+                android:id="@+id/btn_next"
+                style="@style/FP.ActionButton"
+                android:contentDescription="Next track"
+                android:tooltipText="Next track">
+                <ImageView
+                    android:id="@+id/iv_next"
+                    style="@style/FP.ActionIcon"
+                    android:layout_width="34dp"
+                    android:layout_height="34dp"
+                    android:src="@drawable/ic_skip_next" />
+                <TextView
+                    android:id="@+id/tv_next_label"
+                    style="@style/FP.ActionLabel"
+                    android:text="Next" />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/btn_repeat"
+                style="@style/FP.ActionButton"
+                android:contentDescription="Repeat"
+                android:tooltipText="Repeat">
+                <ImageView
+                    android:id="@+id/iv_repeat"
+                    style="@style/FP.ActionIcon"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:src="@drawable/ic_repeat" />
+                <TextView
+                    android:id="@+id/tv_repeat_label"
+                    style="@style/FP.ActionLabel"
+                    android:text="Repeat" />
+            </LinearLayout>
+            </LinearLayout>
 
-            <ImageButton android:id="@+id/btn_play_pause"
-                android:layout_width="68dp" android:layout_height="68dp"
-                android:src="@android:drawable/ic_media_pause"
-                android:tint="@color/white"
-                android:background="@drawable/bg_play_button"
-                android:layout_marginHorizontal="8dp"
-                android:padding="14dp" />
-
-            <ImageButton android:id="@+id/btn_next"
-                android:layout_width="52dp" android:layout_height="52dp"
-                android:src="@android:drawable/ic_media_next"
-                android:tint="@color/white"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:layout_marginHorizontal="8dp" />
-
-            <ImageButton android:id="@+id/btn_repeat"
-                android:layout_width="44dp" android:layout_height="44dp"
-                android:src="@android:drawable/ic_menu_rotate"
-                android:tint="@color/on_surface_variant_dark"
-                android:background="?attr/selectableItemBackgroundBorderless" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+            <LinearLayout
+                android:id="@+id/btn_speed"
+                style="@style/FP.ActionButton"
+                android:contentDescription="Playback speed"
+                android:tooltipText="Playback speed">
+                <ImageView
+                    android:id="@+id/iv_speed"
+                    style="@style/FP.ActionIcon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_speed" />
+                <TextView
+                    android:id="@+id/tv_speed_label"
+                    style="@style/FP.ActionLabel"
+                    android:text="1.0×" />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/btn_sleep"
+                style="@style/FP.ActionButton"
+                android:contentDescription="Sleep timer"
+                android:tooltipText="Sleep timer">
+                <ImageView
+                    android:id="@+id/iv_sleep"
+                    style="@style/FP.ActionIcon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_bedtime" />
+                <TextView
+                    android:id="@+id/tv_sleep_label"
+                    style="@style/FP.ActionLabel"
+                    android:text="Sleep" />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/btn_queue"
+                style="@style/FP.ActionButton"
+                android:contentDescription="Show queue"
+                android:tooltipText="Show queue">
+                <ImageView
+                    android:id="@+id/iv_queue"
+                    style="@style/FP.ActionIcon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_queue_music" />
+                <TextView
+                    android:id="@+id/tv_queue_label"
+                    style="@style/FP.ActionLabel"
+                    android:text="Queue" />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/btn_playlist"
+                style="@style/FP.ActionButton"
+                android:contentDescription="Add to playlist"
+                android:tooltipText="Add to playlist">
+                <ImageView
+                    android:id="@+id/iv_playlist"
+                    style="@style/FP.ActionIcon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_playlist_add" />
+                <TextView
+                    android:id="@+id/tv_playlist_label"
+                    style="@style/FP.ActionLabel"
+                    android:text="Playlist" />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/btn_share"
+                style="@style/FP.ActionButton"
+                android:contentDescription="Share"
+                android:tooltipText="Share">
+                <ImageView
+                    android:id="@+id/iv_share"
+                    style="@style/FP.ActionIcon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_share" />
+                <TextView
+                    android:id="@+id/tv_share_label"
+                    style="@style/FP.ActionLabel"
+                    android:text="Share" />
+            </LinearLayout>
+            </LinearLayout>
         </LinearLayout>
-
-        <!-- Action chips -->
-        <com.google.android.material.chip.ChipGroup
-            android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:layout_gravity="center">
-            <com.google.android.material.chip.Chip android:id="@+id/chip_speed"
-                android:layout_width="wrap_content" android:layout_height="32dp"
-                android:text="1.0×" android:textColor="@color/white"
-                style="@style/Widget.Material3.Chip.Filter" />
-            <com.google.android.material.chip.Chip android:id="@+id/chip_sleep"
-                android:layout_width="wrap_content" android:layout_height="32dp"
-                android:text="Sleep" android:textColor="@color/white"
-                style="@style/Widget.Material3.Chip.Filter" />
-            <com.google.android.material.chip.Chip android:id="@+id/chip_share"
-                android:layout_width="wrap_content" android:layout_height="32dp"
-                android:text="Share" android:textColor="@color/white"
-                style="@style/Widget.Material3.Chip.Filter" />
-        </com.google.android.material.chip.ChipGroup>
     </LinearLayout>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>

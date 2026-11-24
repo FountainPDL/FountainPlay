@@ -1,156 +1,212 @@
 package com.fountainpdl.fountainplay.adapter;
 
-import android.view.*;
-import android.widget.*;
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.fountainpdl.fountainplay.R;
 import com.fountainpdl.fountainplay.model.MediaItem;
-import java.util.*;
+import com.fountainpdl.fountainplay.util.Fx;
+import com.fountainpdl.fountainplay.util.PlaybackState;
+import com.fountainpdl.fountainplay.util.ResumeStore;
+import com.fountainpdl.fountainplay.util.ThemeColors;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
 
-public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+/** Songs and videos as rows (MODE_ROW) or as a video card grid (MODE_GRID). Handles filtering and sorting itself. */
+public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements PlaybackState.Listener {
 
-    public interface OnItemClickListener  { void onItemClick(MediaItem item, int pos); }
-    public interface OnItemLongListener  { void onItemLong(MediaItem item, int pos, View anchor); }
+    public static final int MODE_ROW = 0, MODE_GRID = 1;
 
-    private List<MediaItem> items;
-    private final List<MediaItem> allItems = new ArrayList<>();
-    private final int viewType;
-    private final Set<Integer> selected = new HashSet<>();
-    private boolean selectionMode = false;
-    private OnItemClickListener clickListener;
-    private OnItemLongListener  longListener;
+    public interface OnItemClick { void onClick(MediaItem item, int position); }
+    public interface OnItemMore  { void onMore(MediaItem item, View anchor); }
 
-    public MediaAdapter(List<MediaItem> items, int viewType) {
-        this.items = items;
-        this.allItems.addAll(items);
-        this.viewType = viewType;
+    private final int mode;
+    private List<MediaItem> all = new ArrayList<>();
+    private List<MediaItem> shown = new ArrayList<>();
+    private String query = "";
+    private String sortKey = "date";
+    private boolean ascending = false;
+    private OnItemClick click;
+    private OnItemMore more;
+    private int lastAnimated = -1;
+    private int primary, onSurface;
+    private ResumeStore resume;
+    private RecyclerView attached;
+
+    public MediaAdapter(int mode) { this.mode = mode; }
+
+    public void setOnItemClick(OnItemClick l) { click = l; }
+    public void setOnItemMore(OnItemMore l) { more = l; }
+
+    public void submit(List<MediaItem> items) {
+        all = new ArrayList<>(items);
+        apply();
     }
 
-    public void setOnItemClickListener(OnItemClickListener l) { clickListener = l; }
-    public void setOnItemLongListener(OnItemLongListener l)   { longListener = l; }
+    public void setQuery(String q) {
+        query = q == null ? "" : q.trim().toLowerCase(Locale.ROOT);
+        apply();
+    }
 
-    // ── Filtering ──
-    public void filter(String query) {
-        items.clear();
-        if (query == null || query.isEmpty()) { items.addAll(allItems); }
-        else {
-            String q = query.toLowerCase();
-            for (MediaItem m : allItems)
-                if (m.getTitle().toLowerCase().contains(q) || m.getArtist().toLowerCase().contains(q))
-                    items.add(m);
+    /** Choosing the same key again flips the direction. */
+    public void setSort(String key) {
+        if (key.equals(sortKey)) ascending = !ascending;
+        else { sortKey = key; ascending = "title".equals(key) || "artist".equals(key); }
+        apply();
+    }
+
+    public String getSortKey() { return sortKey; }
+    public boolean isAscending() { return ascending; }
+    public List<MediaItem> getShown() { return new ArrayList<>(shown); }
+
+    private void apply() {
+        List<MediaItem> out = new ArrayList<>();
+        for (MediaItem m : all) {
+            if (query.isEmpty()
+                || m.getTitle().toLowerCase(Locale.ROOT).contains(query)
+                || m.getArtist().toLowerCase(Locale.ROOT).contains(query)
+                || m.getAlbum().toLowerCase(Locale.ROOT).contains(query)
+                || m.getFileName().toLowerCase(Locale.ROOT).contains(query)) out.add(m);
         }
+        final boolean asc = ascending;
+        Collections.sort(out, (a, b) -> {
+            int r;
+            switch (sortKey) {
+                case "title":    r = a.getTitle().compareToIgnoreCase(b.getTitle()); break;
+                case "artist":   r = a.getArtist().compareToIgnoreCase(b.getArtist()); break;
+                case "duration": r = Long.compare(a.getDuration(), b.getDuration()); break;
+                case "size":     r = Long.compare(a.getSize(), b.getSize()); break;
+                default:         r = Long.compare(a.getDateAdded(), b.getDateAdded()); break;
+            }
+            return asc ? r : -r;
+        });
+        shown = out;
+        lastAnimated = -1;
         notifyDataSetChanged();
     }
 
-    public void updateAll(List<MediaItem> newItems) {
-        allItems.clear(); allItems.addAll(newItems);
-        items.clear(); items.addAll(newItems);
-        notifyDataSetChanged();
+    @Override public void onAttachedToRecyclerView(@NonNull RecyclerView rv) {
+        attached = rv;
+        PlaybackState.get().addListener(this);
+        Context c = rv.getContext();
+        primary = ThemeColors.get(c, "colorPrimary");
+        onSurface = ThemeColors.get(c, "colorOnSurface");
+        resume = new ResumeStore(c);
     }
 
-    // ── Sorting ──
-    public void sort(String by) {
-        switch (by) {
-            case "name":  Collections.sort(items, (a,b) -> a.getTitle().compareToIgnoreCase(b.getTitle())); break;
-            case "artist":Collections.sort(items, (a,b) -> a.getArtist().compareToIgnoreCase(b.getArtist())); break;
-            case "size":  Collections.sort(items, (a,b) -> Long.compare(b.getSize(), a.getSize())); break;
-            case "date":  Collections.sort(items, (a,b) -> Long.compare(b.getDateAdded(), a.getDateAdded())); break;
-            case "duration": Collections.sort(items, (a,b) -> Long.compare(b.getDuration(), a.getDuration())); break;
-            case "folder": Collections.sort(items, (a,b) -> a.getFolder().compareToIgnoreCase(b.getFolder())); break;
-        }
-        notifyDataSetChanged();
+    @Override public void onDetachedFromRecyclerView(@NonNull RecyclerView rv) {
+        PlaybackState.get().removeListener(this);
+        attached = null;
     }
 
-    public void reverse() { Collections.reverse(items); notifyDataSetChanged(); }
-
-    // ── Selection ──
-    public void toggleSelection(int pos) {
-        if (selected.contains(pos)) selected.remove(pos); else selected.add(pos);
-        notifyItemChanged(pos);
-    }
-    public void selectAll() { for (int i=0;i<items.size();i++) selected.add(i); notifyDataSetChanged(); }
-    public void clearSelection() { selected.clear(); selectionMode = false; notifyDataSetChanged(); }
-    public boolean isSelectionMode() { return !selected.isEmpty(); }
-    public Set<Integer> getSelected() { return selected; }
-    public List<MediaItem> getSelectedItems() {
-        List<MediaItem> r = new ArrayList<>();
-        for (int i : selected) if (i < items.size()) r.add(items.get(i));
-        return r;
+    // Highlight the playing song
+    @Override public void onItemChanged(MediaItem item) { refreshSoon(); }
+    @Override public void onPlayStateChanged(boolean playing) { }
+    @Override public void onPositionChanged(long pos, long duration) { }
+    private void refreshSoon() {
+        if (attached != null) attached.post(this::notifyDataSetChanged);
     }
 
-    @Override public int getItemViewType(int pos) { return viewType; }
+    @Override public int getItemViewType(int pos) { return mode; }
 
     @NonNull @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int vt) {
         LayoutInflater inf = LayoutInflater.from(parent.getContext());
-        if (vt == 0) return new AudioVH(inf.inflate(R.layout.item_song, parent, false));
-        else return new VideoVH(inf.inflate(R.layout.item_video, parent, false));
+        RecyclerView.ViewHolder h = vt == MODE_GRID
+            ? new GridVH(inf.inflate(R.layout.item_video, parent, false))
+            : new RowVH(inf.inflate(R.layout.item_song, parent, false));
+        Fx.press(h.itemView);
+        return h;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int pos) {
-        MediaItem item = items.get(pos);
-        boolean isSel = selected.contains(pos);
-        holder.itemView.setActivated(isSel);
-        holder.itemView.setAlpha(isSel ? 0.7f : 1.0f);
-        if (holder instanceof AudioVH) ((AudioVH)holder).bind(item);
-        else ((VideoVH)holder).bind(item);
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        final MediaItem item = shown.get(position);
+        Fx.reset(holder.itemView);
+        if (holder instanceof RowVH) bindRow((RowVH) holder, item);
+        else bindGrid((GridVH) holder, item);
 
         holder.itemView.setOnClickListener(v -> {
-            if (isSelectionMode()) { toggleSelection(pos); }
-            else if (clickListener != null) clickListener.onItemClick(item, pos);
+            int p = holder.getBindingAdapterPosition();
+            if (click != null && p != RecyclerView.NO_POSITION) click.onClick(item, p);
         });
-        holder.itemView.setOnLongClickListener(v -> {
-            if (longListener != null) longListener.onItemLong(item, pos, v);
-            return true;
-        });
-        // Wire ⋮ button from either item layout
-        android.widget.ImageButton moreBtn = holder.itemView.findViewById(R.id.btn_song_more);
-        if (moreBtn == null) moreBtn = holder.itemView.findViewById(R.id.btn_video_more);
-        if (moreBtn != null) {
-            final android.widget.ImageButton finalMore = moreBtn;
-            finalMore.setOnClickListener(v -> {
-                if (longListener != null) longListener.onItemLong(item, pos, holder.itemView);
-            });
+        if (position > lastAnimated && position < 14) {
+            lastAnimated = position;
+            Fx.enter(holder.itemView, position);
         }
     }
 
-    @Override public int getItemCount() { return items.size(); }
+    private void bindRow(RowVH h, MediaItem item) {
+        h.title.setText(item.getTitle());
+        h.sub.setText(item.isVideo()
+            ? "Video · " + String.format(Locale.US, "%.0f MB", item.getSize() / 1024f / 1024f)
+            : item.getArtist());
+        h.dur.setText(item.getDuration() > 0 ? item.getFormattedDuration() : "");
+        boolean playing = item.isAudio() && PlaybackState.get().getCurrentItem() != null
+            && item.getPath() != null && item.getPath().equals(PlaybackState.get().getCurrentItem().getPath());
+        h.title.setTextColor(playing ? primary : onSurface);
+        if (item.isVideo()) {
+            Glide.with(h.art).load(item.getPath()).centerCrop().placeholder(R.drawable.bg_video_placeholder).into(h.art);
+        } else if (item.getAlbumArtUri() != null) {
+            Glide.with(h.art).load(item.getAlbumArtUri()).centerCrop()
+                .placeholder(R.drawable.bg_art_placeholder).error(R.drawable.bg_art_placeholder).into(h.art);
+        } else {
+            h.art.setImageResource(R.drawable.bg_art_placeholder);
+        }
+        h.more.setOnClickListener(v -> { if (more != null) more.onMore(item, v); });
+        h.itemView.setOnLongClickListener(v -> { if (more != null) more.onMore(item, h.more); return true; });
+    }
 
-    // ── ViewHolders ──
-    static class AudioVH extends RecyclerView.ViewHolder {
-        ImageView art; TextView title, artist, duration;
-        AudioVH(View v) { super(v);
+    private void bindGrid(GridVH h, MediaItem item) {
+        h.title.setText(item.getTitle());
+        h.info.setText(String.format(Locale.US, "%.0f MB", item.getSize() / 1024f / 1024f));
+        h.dur.setText(item.getFormattedDuration());
+        Glide.with(h.thumb).load(item.getPath()).centerCrop().placeholder(R.drawable.bg_video_placeholder).into(h.thumb);
+        long pos = resume == null ? 0 : resume.getPosition(item.getPath());
+        if (pos > 0 && item.getDuration() > 0) {
+            h.progress.setVisibility(View.VISIBLE);
+            h.progress.setProgress((int) Math.min(1000, pos * 1000 / item.getDuration()));
+        } else {
+            h.progress.setVisibility(View.GONE);
+        }
+        h.more.setOnClickListener(v -> { if (more != null) more.onMore(item, v); });
+        h.itemView.setOnLongClickListener(v -> { if (more != null) more.onMore(item, h.more); return true; });
+    }
+
+    @Override public int getItemCount() { return shown.size(); }
+
+    static class RowVH extends RecyclerView.ViewHolder {
+        final ImageView art; final TextView title, sub, dur; final ImageButton more;
+        RowVH(View v) {
+            super(v);
             art = v.findViewById(R.id.iv_album_art);
             title = v.findViewById(R.id.tv_song_title);
-            artist = v.findViewById(R.id.tv_song_artist);
-            duration = v.findViewById(R.id.tv_song_duration); }
-        void bind(MediaItem item) {
-            title.setText(item.getTitle());
-            artist.setText(item.getArtist());
-            duration.setText(item.getFormattedDuration());
-            if (item.getAlbumArtUri() != null)
-                Glide.with(itemView).load(item.getAlbumArtUri()).centerCrop()
-                    .placeholder(R.drawable.bg_play_button).into(art);
-            else art.setImageResource(R.drawable.bg_play_button);
-            // wired in onBindViewHolder
+            sub = v.findViewById(R.id.tv_song_artist);
+            dur = v.findViewById(R.id.tv_song_duration);
+            more = v.findViewById(R.id.btn_song_more);
         }
     }
 
-    static class VideoVH extends RecyclerView.ViewHolder {
-        ImageView thumb; TextView title, info, dur;
-        VideoVH(View v) { super(v);
+    static class GridVH extends RecyclerView.ViewHolder {
+        final ImageView thumb; final TextView title, info, dur; final ImageButton more; final ProgressBar progress;
+        GridVH(View v) {
+            super(v);
             thumb = v.findViewById(R.id.iv_thumbnail);
             title = v.findViewById(R.id.tv_video_title);
             info = v.findViewById(R.id.tv_video_info);
-            dur = v.findViewById(R.id.tv_duration_badge); }
-        void bind(MediaItem item) {
-            title.setText(item.getTitle()); dur.setText(item.getFormattedDuration());
-            info.setText((item.getSize() / (1024*1024)) + " MB");
-            Glide.with(itemView).load(item.getPath()).centerCrop()
-                .placeholder(R.drawable.bg_play_button).into(thumb);
+            dur = v.findViewById(R.id.tv_duration_badge);
+            more = v.findViewById(R.id.btn_video_more);
+            progress = v.findViewById(R.id.pb_watched);
         }
     }
 }

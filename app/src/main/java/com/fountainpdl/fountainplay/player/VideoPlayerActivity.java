@@ -57,7 +57,9 @@ import com.fountainpdl.fountainplay.util.AppPreferences;
 import com.fountainpdl.fountainplay.util.MediaUris;
 import com.fountainpdl.fountainplay.util.ResumeStore;
 import com.fountainpdl.fountainplay.util.VideoQueue;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
+import com.fountainpdl.fountainplay.util.ThemeSetup;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -80,11 +82,13 @@ public class VideoPlayerActivity extends AppCompatActivity {
     private final Handler handler = new Handler(Looper.getMainLooper());
 
     private View touchLayer, controlsOverlay, overlayLeft, overlayRight;
-    private ImageButton btnBack, btnPlay, btnRew, btnFf, btnLock, btnUnlock, btnPip, btnMore;
-    private ImageButton btnPrevVideo, btnNextVideo;
+    private View btnBack, btnRew, btnFf, btnPip, btnMore, btnPrevVideo, btnNextVideo;
+    private ImageButton btnPlay;
+    private MaterialButton btnUnlock;
+    private TextView tvPlayLabel;
     private SeekBar seekBar;
     private TextView tvPos, tvDur, tvTitle, tvSeekIndicator, tvBrightness, tvVolume;
-    private Chip chipSpeed, chipRatio, chipSubtitle, chipAudio, chipSleep;
+    private Chip chipLock, chipSpeed, chipRatio, chipSubtitle, chipAudio, chipSleep;
 
     private boolean isLocked = false;
     private boolean controlsVisible = true;
@@ -147,6 +151,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ThemeSetup.apply(this, false);   // accent only: the video window stays black
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_video_player);
 
@@ -174,7 +179,8 @@ public class VideoPlayerActivity extends AppCompatActivity {
         btnPlay         = findViewById(R.id.btn_play_video);
         btnRew          = findViewById(R.id.btn_rew);
         btnFf           = findViewById(R.id.btn_ff);
-        btnLock         = findViewById(R.id.btn_lock);
+        chipLock        = findViewById(R.id.chip_lock);
+        tvPlayLabel     = findViewById(R.id.tv_play_label);
         btnUnlock       = findViewById(R.id.btn_unlock);
         btnPip          = findViewById(R.id.btn_pip);
         btnMore         = findViewById(R.id.btn_more);
@@ -345,8 +351,9 @@ public class VideoPlayerActivity extends AppCompatActivity {
     }
 
     private void updatePlayIcon() {
-        btnPlay.setImageResource(player.getPlayWhenReady()
-            ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play);
+        boolean playing = player.getPlayWhenReady();
+        btnPlay.setImageResource(playing ? R.drawable.ic_pause : R.drawable.ic_play);
+        tvPlayLabel.setText(playing ? "Pause" : "Play");
     }
 
     private void updateNextPrev() {
@@ -358,6 +365,8 @@ public class VideoPlayerActivity extends AppCompatActivity {
 
     private void setupControls() {
         btnBack.setOnClickListener(v -> finish());
+        ((TextView) findViewById(R.id.btn_rew_label)).setText("Back " + prefs.getSkipInterval() + "s");
+        ((TextView) findViewById(R.id.btn_ff_label)).setText("Fwd " + prefs.getSkipInterval() + "s");
 
         btnPlay.setOnClickListener(v -> { togglePlay(); scheduleHideControls(); });
 
@@ -375,7 +384,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
             scheduleHideControls();
         });
 
-        btnLock.setOnClickListener(v -> setLocked(true));
+        chipLock.setOnClickListener(v -> setLocked(true));
         btnUnlock.setOnClickListener(v -> setLocked(false));
 
         btnPip.setOnClickListener(v -> enterPiP());

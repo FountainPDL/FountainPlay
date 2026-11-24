@@ -1,57 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="4dp"
+    android:layout_margin="6dp"
     android:clickable="true"
     android:focusable="true"
-    app:cardCornerRadius="8dp"
-    app:cardBackgroundColor="@color/surface_variant_dark"
-    app:cardElevation="2dp">
+    app:cardBackgroundColor="?attr/colorSurfaceContainer"
+    app:cardCornerRadius="18dp"
+    app:cardElevation="0dp"
+    app:strokeWidth="0dp">
 
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <FrameLayout android:layout_width="match_parent" android:layout_height="110dp">
-            <ImageView android:id="@+id/iv_thumbnail"
-                android:layout_width="match_parent" android:layout_height="match_parent"
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="108dp">
+
+            <ImageView
+                android:id="@+id/iv_thumbnail"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                android:background="@color/surface_variant_dark" />
-            <ImageView android:layout_width="32dp" android:layout_height="32dp"
-                android:layout_gravity="center"
-                android:src="@android:drawable/ic_media_play"
-                android:tint="#CCFFFFFF" />
-            <TextView android:id="@+id/tv_duration_badge"
-                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:src="@drawable/bg_video_placeholder" />
+
+            <TextView
+                android:id="@+id/tv_duration_badge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_gravity="bottom|end"
-                android:layout_margin="5dp"
-                android:background="@color/overlay_dark"
-                android:textColor="@color/white" android:textSize="11sp" android:textStyle="bold"
-                android:paddingHorizontal="5dp" android:paddingVertical="2dp" />
+                android:layout_margin="6dp"
+                android:background="@drawable/bg_badge"
+                android:textAppearance="?attr/textAppearanceLabelSmall"
+                android:textColor="?attr/fpOnScrim"
+                android:textStyle="bold"
+                android:paddingHorizontal="6dp"
+                android:paddingVertical="2dp" />
+
+            <ProgressBar
+                android:id="@+id/pb_watched"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:layout_gravity="bottom"
+                android:max="1000"
+                android:progressTint="?attr/colorPrimary"
+                android:progressBackgroundTint="?attr/fpScrim"
+                android:visibility="gone" />
         </FrameLayout>
 
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:orientation="horizontal" android:gravity="center_vertical"
-            android:paddingHorizontal="8dp" android:paddingVertical="6dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="12dp"
+            android:paddingEnd="2dp"
+            android:paddingVertical="8dp">
 
-            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-                android:layout_weight="1" android:orientation="vertical">
-                <TextView android:id="@+id/tv_video_title"
-                    android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:textColor="@color/white" android:textSize="13sp" android:textStyle="bold"
-                    android:maxLines="2" android:ellipsize="end" />
-                <TextView android:id="@+id/tv_video_info"
-                    android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:textColor="@color/on_surface_variant_dark" android:textSize="11sp" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/tv_video_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?attr/textAppearanceTitleSmall"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textStyle="bold"
+                    android:maxLines="2"
+                    android:ellipsize="end" />
+                <TextView
+                    android:id="@+id/tv_video_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textAppearance="?attr/textAppearanceLabelSmall"
+                    android:textColor="?attr/colorOnSurfaceVariant" />
             </LinearLayout>
 
-            <ImageButton android:id="@+id/btn_video_more"
-                android:layout_width="30dp" android:layout_height="30dp"
-                android:src="@android:drawable/ic_menu_more"
-                android:tint="@color/on_surface_variant_dark"
+            <ImageButton
+                android:id="@+id/btn_video_more"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_more_vert"
+                android:contentDescription="More options"
+                android:tooltipText="More options"
+                app:tint="?attr/colorOnSurfaceVariant"
                 android:background="?attr/selectableItemBackgroundBorderless" />
         </LinearLayout>
     </LinearLayout>
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

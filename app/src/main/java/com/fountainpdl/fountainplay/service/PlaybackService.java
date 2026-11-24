@@ -59,6 +59,11 @@ public class PlaybackService extends MediaSessionService implements PlayQueue.Li
         }
     };
 
+    private android.content.SharedPreferences settings;
+    private boolean sessionRegistered = false;
+    private final android.content.SharedPreferences.OnSharedPreferenceChangeListener prefListener =
+        (sp, key) -> { if (AppPreferences.KEY_SHOW_NOTIFICATION.equals(key)) syncSessionRegistration(); };
+
     private final IBinder binder = new LocalBinder();
     public class LocalBinder extends Binder {
         public PlaybackService getService() { return PlaybackService.this; }
@@ -138,9 +143,11 @@ public class PlaybackService extends MediaSessionService implements PlayQueue.Li
         provider.setSmallIcon(R.drawable.ic_stat_fountain);
         setMediaNotificationProvider(provider);
 
-        // Register the session with Media3 right away. Without this the notification only appears
-        // once an external MediaController connects, which this app never did.
-        addSession(mediaSession);
+        // Register the session with Media3 right away (unless the user turned the notification off in
+        // Settings). Without this the notification only appears once an external MediaController connects.
+        settings = getSharedPreferences(AppPreferences.PREF, MODE_PRIVATE);
+        settings.registerOnSharedPreferenceChangeListener(prefListener);
+        syncSessionRegistration();
 
         PlayQueue.get().addListener(this);
     }
@@ -291,6 +298,19 @@ public class PlaybackService extends MediaSessionService implements PlayQueue.Li
         }).start();
     }
 
+    /** Shows or hides the notification and lock-screen controls when the Settings toggle changes. */
+    private void syncSessionRegistration() {
+        if (mediaSession == null || settings == null) return;
+        boolean want = settings.getBoolean(AppPreferences.KEY_SHOW_NOTIFICATION, true);
+        if (want && !sessionRegistered) {
+            addSession(mediaSession);
+            sessionRegistered = true;
+        } else if (!want && sessionRegistered) {
+            removeSession(mediaSession);
+            sessionRegistered = false;
+        }
+    }
+
     // ── Service plumbing ────────────────────────────────────────────────────────
 
     @Nullable @Override
@@ -307,7 +327,7 @@ public class PlaybackService extends MediaSessionService implements PlayQueue.Li
     /** Swiping the app out of Recents: keep playing unless the user turned background playback off. */
     @Override
     public void onTaskRemoved(@Nullable Intent rootIntent) {
-        boolean keep = new AppPreferences(this).getBoolean(PREF_BACKGROUND_PLAYBACK, true);
+        boolean keep = new AppPreferences(this).getBoolean(AppPreferences.KEY_BACKGROUND, true);
         if (!keep || !exo.getPlayWhenReady() || exo.getMediaItemCount() == 0) {
             exo.pause();
             stopSelf();
@@ -317,6 +337,7 @@ public class PlaybackService extends MediaSessionService implements PlayQueue.Li
     @Override
     public void onDestroy() {
         handler.removeCallbacksAndMessages(null);
+        if (settings != null) settings.unregisterOnSharedPreferenceChangeListener(prefListener);
         PlayQueue.get().removeListener(this);
         if (mediaSession != null) {
             mediaSession.release();
