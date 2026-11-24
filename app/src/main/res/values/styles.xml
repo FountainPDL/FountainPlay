@@ -26,18 +26,18 @@
     </style>
 
     <!-- Section titles -->
-    <style name="FP.SectionTitle">
+    <style name="FP.SectionTitle" parent="">
         <item name="android:textAppearance">?attr/textAppearanceTitleLarge</item>
         <item name="android:textColor">?attr/colorOnSurface</item>
         <item name="android:textStyle">bold</item>
     </style>
-    <style name="FP.Caption">
+    <style name="FP.Caption" parent="">
         <item name="android:textAppearance">?attr/textAppearanceBodySmall</item>
         <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
     </style>
 
     <!-- Icon-over-label action button (player, toolbars) -->
-    <style name="FP.ActionButton">
+    <style name="FP.ActionButton" parent="">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_weight">1</item>
@@ -48,12 +48,12 @@
         <item name="android:clickable">true</item>
         <item name="android:focusable">true</item>
     </style>
-    <style name="FP.ActionIcon">
+    <style name="FP.ActionIcon" parent="">
         <item name="android:layout_width">26dp</item>
         <item name="android:layout_height">26dp</item>
         <item name="tint">?attr/colorOnSurfaceVariant</item>
     </style>
-    <style name="FP.ActionLabel">
+    <style name="FP.ActionLabel" parent="">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginTop">2dp</item>
