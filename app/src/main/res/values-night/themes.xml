@@ -26,9 +26,9 @@
         <item name="colorSurfaceContainerHighest">@color/fp_fountain_surfacecontainerhighest_dark</item>
         <item name="colorSurfaceInverse">@color/fp_fountain_surfaceinverse_dark</item>
         <item name="colorOnSurfaceInverse">@color/fp_fountain_onsurfaceinverse_dark</item>
-        <item name="android:colorBackground">@color/fp_fountain_surface_dark</item>
-        <item name="colorOnBackground">@color/fp_fountain_onsurface_dark</item>
-        <item name="android:windowBackground">@color/fp_fountain_surface_dark</item>
+        <item name="android:colorBackground">?attr/colorSurface</item>
+        <item name="colorOnBackground">?attr/colorOnSurface</item>
+        <item name="android:windowBackground">?attr/colorSurface</item>
         <item name="android:statusBarColor">@color/fp_transparent</item>
         <item name="android:navigationBarColor">@color/fp_transparent</item>
         <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
@@ -214,7 +214,5 @@
         <item name="colorSurfaceContainer">@color/fp_amoled_surfacecontainer</item>
         <item name="colorSurfaceContainerHigh">@color/fp_amoled_surfacecontainerhigh</item>
         <item name="colorSurfaceContainerHighest">@color/fp_amoled_surfacecontainerhighest</item>
-        <item name="android:colorBackground">@color/fp_amoled_surface</item>
-        <item name="android:windowBackground">@color/fp_amoled_surface</item>
     </style>
 </resources>

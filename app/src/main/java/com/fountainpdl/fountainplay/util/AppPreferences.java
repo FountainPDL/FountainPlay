@@ -49,4 +49,18 @@ public class AppPreferences {
     public boolean getBoolean(String k, boolean def) { return p.getBoolean(k, def); }
     public void    setBoolean(String k, boolean v)   { p.edit().putBoolean(k, v).apply(); }
     public String  getString(String k, String def)   { return p.getString(k, def); }
+    public int     getInt(String k, int def)         { return p.getInt(k, def); }
+    public void    setInt(String k, int v)           { p.edit().putInt(k, v).apply(); }
+
+    /**
+     * Earlier builds of the Settings screen could save every switch as "off" when the screen was restored.
+     * Put the switches back to their defaults, once.
+     */
+    public void resetTogglesOnce() {
+        if (p.getBoolean("toggle_reset_v1", false)) return;
+        p.edit().remove(KEY_BACKGROUND).remove(KEY_SHOW_NOTIFICATION).remove(KEY_REMEMBER_POS)
+            .remove(KEY_GESTURES).remove(KEY_AUTO_PIP).remove(KEY_DYNAMIC_COLOR)
+            .remove("asked_post_notifications")
+            .putBoolean("toggle_reset_v1", true).apply();
+    }
 }

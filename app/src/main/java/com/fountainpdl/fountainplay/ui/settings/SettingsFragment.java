@@ -1,18 +1,30 @@
 package com.fountainpdl.fountainplay.ui.settings;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PowerManager;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 import com.fountainpdl.fountainplay.R;
@@ -36,14 +48,29 @@ public class SettingsFragment extends Fragment {
     private static final int[] SKIP_VALUES = {5, 10, 15, 30, 60};
     private static final float[] SPEED_VALUES = {0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 2.0f};
 
+    private final ActivityResultLauncher<String> notificationPermission =
+        registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> {
+            if (!isAdded()) return;
+            if (!granted && !notificationsAllowed()) openNotificationSettings();
+            build();
+        });
+
     @Nullable @Override
     public View onCreateView(@NonNull LayoutInflater inf, @Nullable ViewGroup c, @Nullable Bundle s) {
         View v = inf.inflate(R.layout.fragment_settings, c, false);
         inflater = inf;
         prefs = new AppPreferences(requireContext());
         container = v.findViewById(R.id.settings_container);
+        // Rows are rebuilt from the saved settings every time. The system must never "restore" their state.
+        container.setSaveEnabled(false);
         build();
         return v;
+    }
+
+    /** Coming back from a system settings screen: show the new permission / battery status. */
+    @Override public void onResume() {
+        super.onResume();
+        if (container != null) build();
     }
 
     private void build() {
@@ -59,11 +86,22 @@ public class SettingsFragment extends Fragment {
 
         header("Notifications and background");
         toggleRow(R.drawable.ic_notifications, "Show player notification and lock-screen controls",
-            "Controls in the notification shade, on the lock screen and on Bluetooth devices",
-            AppPreferences.KEY_SHOW_NOTIFICATION, true, true, null);
+            "Controls in the notification shade, on the lock screen and on Bluetooth devices. Also keeps music alive in the background.",
+            AppPreferences.KEY_SHOW_NOTIFICATION, true, true, checked -> {
+                if (checked && !notificationsAllowed()) askNotificationPermission();
+            });
         toggleRow(R.drawable.ic_music_note, "Keep playing when the app is closed",
             "Music continues after you swipe the app away from Recents",
             AppPreferences.KEY_BACKGROUND, true, true, null);
+
+        header("Background playback check");
+        choiceRow(R.drawable.ic_notifications, "Notification permission",
+            notificationsAllowed() ? "Allowed" : "Blocked", v -> askNotificationPermission());
+        choiceRow(R.drawable.ic_schedule, "Battery restriction",
+            ignoringBatteryOptimizations() ? "Unrestricted" : "Optimized", v -> openBatterySettings());
+        actionRow(R.drawable.ic_info, "If music still stops",
+            "Some phones (Xiaomi, Huawei, Oppo, Samsung and others) stop music apps in the background. "
+                + "Set Fountain Play to Unrestricted above, and allow notifications.", null);
 
         header("Video playback");
         toggleRow(R.drawable.ic_play, "Remember position",
@@ -84,7 +122,7 @@ public class SettingsFragment extends Fragment {
                 NavHostFragment.findNavController(this).navigate(R.id.nav_manage_folders));
         actionRow(R.drawable.ic_refresh, "Rescan library", "Look for new and removed files", v -> {
             LibraryRepo.get(requireContext()).refresh();
-            android.widget.Toast.makeText(requireContext(), "Scanning…", android.widget.Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), "Scanning…", Toast.LENGTH_SHORT).show();
         });
 
         header("About");
@@ -103,6 +141,7 @@ public class SettingsFragment extends Fragment {
 
     private View baseRow(@DrawableRes int icon, String title, String sub) {
         View row = inflater.inflate(R.layout.item_setting_row, container, false);
+        row.setSaveEnabled(false);
         ((ImageView) row.findViewById(R.id.iv_setting_icon)).setImageResource(icon);
         ((TextView) row.findViewById(R.id.tv_setting_title)).setText(title);
         TextView s = row.findViewById(R.id.tv_setting_sub);
@@ -126,21 +165,28 @@ public class SettingsFragment extends Fragment {
 
     private interface OnToggle { void onChanged(boolean checked); }
 
+    /**
+     * A switch row. The setting is saved only when the user taps it. (Listening for "checked changed"
+     * would also fire when Android restores the screen, and that used to save every switch as off.)
+     */
     private void toggleRow(@DrawableRes int icon, String title, String sub, final String key,
                            boolean def, boolean enabled, final OnToggle after) {
         View row = baseRow(icon, title, sub);
         final MaterialSwitch sw = row.findViewById(R.id.sw_setting);
+        sw.setId(View.generateViewId());       // every row used the same id: never share state between switches
+        sw.setSaveEnabled(false);
         sw.setVisibility(View.VISIBLE);
         sw.setChecked(prefs.getBoolean(key, def));
         sw.setEnabled(enabled);
         row.setEnabled(enabled);
         row.setAlpha(enabled ? 1f : 0.5f);
         if (!enabled) return;
-        sw.setOnCheckedChangeListener((b, checked) -> {
-            prefs.setBoolean(key, checked);
-            if (after != null) after.onChanged(checked);
+        sw.setOnClickListener(v -> {
+            boolean now = sw.isChecked();
+            prefs.setBoolean(key, now);
+            if (after != null) after.onChanged(now);
         });
-        row.setOnClickListener(v -> sw.toggle());
+        row.setOnClickListener(v -> sw.performClick());
     }
 
     // ── Pickers ─────────────────────────────────────────────────────────────────
@@ -152,7 +198,6 @@ public class SettingsFragment extends Fragment {
                 prefs.setTheme(THEME_KEYS[which]);
                 d.dismiss();
                 applyNightMode(THEME_KEYS[which]);
-                build();
                 requireActivity().recreate();
             }).show();
     }
@@ -204,6 +249,57 @@ public class SettingsFragment extends Fragment {
                 d.dismiss();
                 build();
             }).show();
+    }
+
+    // ── Notification permission and battery ─────────────────────────────────────
+
+    private boolean notificationsAllowed() {
+        return NotificationManagerCompat.from(requireContext()).areNotificationsEnabled();
+    }
+
+    private void askNotificationPermission() {
+        if (notificationsAllowed()) {
+            Toast.makeText(requireContext(), "Notifications are already allowed", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                && ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS)
+                    != PackageManager.PERMISSION_GRANTED) {
+            notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS);
+        } else {
+            openNotificationSettings();
+        }
+    }
+
+    private void openNotificationSettings() {
+        try {
+            Intent i = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                .putExtra(Settings.EXTRA_APP_PACKAGE, requireContext().getPackageName());
+            startActivity(i);
+        } catch (Exception e) {
+            openAppDetails();
+        }
+    }
+
+    private boolean ignoringBatteryOptimizations() {
+        PowerManager pm = (PowerManager) requireContext().getSystemService(Context.POWER_SERVICE);
+        return pm != null && pm.isIgnoringBatteryOptimizations(requireContext().getPackageName());
+    }
+
+    private void openBatterySettings() {
+        try {
+            startActivity(new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS));
+            Toast.makeText(requireContext(), "Find Fountain Play and choose Don't optimise", Toast.LENGTH_LONG).show();
+        } catch (Exception e) {
+            openAppDetails();
+        }
+    }
+
+    private void openAppDetails() {
+        try {
+            startActivity(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                Uri.parse("package:" + requireContext().getPackageName())));
+        } catch (Exception ignored) { }
     }
 
     // ── Helpers ─────────────────────────────────────────────────────────────────

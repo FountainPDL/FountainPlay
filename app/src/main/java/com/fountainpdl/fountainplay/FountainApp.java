@@ -8,8 +8,10 @@ public class FountainApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        AppPreferences prefs = new AppPreferences(this);
+        prefs.resetTogglesOnce();
         // Light / dark / follow-system, chosen in Settings
-        String theme = new AppPreferences(this).getTheme();
+        String theme = prefs.getTheme();
         switch (theme) {
             case "light":  AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO); break;
             case "dark":

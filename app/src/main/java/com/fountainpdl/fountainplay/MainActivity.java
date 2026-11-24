@@ -228,10 +228,10 @@ public class MainActivity extends BaseActivity implements PlaybackState.Listener
             if (!granted(Manifest.permission.READ_MEDIA_AUDIO)) need.add(Manifest.permission.READ_MEDIA_AUDIO);
             if (!granted(Manifest.permission.READ_MEDIA_VIDEO)) need.add(Manifest.permission.READ_MEDIA_VIDEO);
             AppPreferences prefs = new AppPreferences(this);
-            if (!granted(Manifest.permission.POST_NOTIFICATIONS)
-                    && !prefs.getBoolean(PREF_ASKED_NOTIFICATIONS, false)) {
+            int asks = prefs.getInt("notification_permission_asks", 0);
+            if (!granted(Manifest.permission.POST_NOTIFICATIONS) && asks < 3) {
                 need.add(Manifest.permission.POST_NOTIFICATIONS);
-                prefs.setBoolean(PREF_ASKED_NOTIFICATIONS, true);
+                prefs.setInt("notification_permission_asks", asks + 1);
             }
         } else if (!granted(Manifest.permission.READ_EXTERNAL_STORAGE)) {
             need.add(Manifest.permission.READ_EXTERNAL_STORAGE);
