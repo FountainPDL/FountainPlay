@@ -429,7 +429,7 @@ public class PlaybackService extends Service implements PlayQueue.Listener, Audi
     private void startForegroundNow(Notification n) {
         try {
             if (Build.VERSION.SDK_INT >= 29) {
-                ServiceCompat.startForeground(this, NOTIFICATION_ID, n, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK);
+                startForeground(NOTIFICATION_ID, n, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK);
             } else {
                 startForeground(NOTIFICATION_ID, n);
             }
