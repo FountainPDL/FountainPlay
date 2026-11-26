@@ -20,3 +20,11 @@
 - Android 13+ notification permission requested, including on upgrade installs.
 - Video player rebuilt (controls re-appear, no overlap, double-tap seek, subtitle and audio tracks, resume position, PiP).
 - Layout insets fixed, icon fixed, sharing fixed, fixed signing key and auto versionCode.
+
+## 1.5.0 - Phase 3: two engines, lock-screen player, all-files indexing
+- Players: ExoPlayer first, VLC when ExoPlayer cannot play a file (AVI, WMV, RMVB, DTS, TrueHD, APE, WMA, AIFF and more), for both music and video.
+- Music service rebuilt: own media session and notification with cover art and Repeat / Previous / Play-Pause / Next / Like buttons.
+- Lock-screen player: clock, spinning vinyl with cover art, controls, Slide to unlock. Settings has a preview button.
+- Cover art read from the file's tags, the system thumbnail, or cover.jpg next to the file.
+- All files access: scans internal storage and SD cards for media Android never indexed; results are cached so rescans are fast.
+- Automatic indexing: on app start, when the media database changes, and when the app returns after 10 minutes.

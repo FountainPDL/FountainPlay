@@ -301,7 +301,7 @@ public class AudioPlayerActivity extends AppCompatActivity
         if (!bound) return;
         final String[] opts = {"0.25×", "0.5×", "0.75×", "1.0×", "1.25×", "1.5×", "1.75×", "2.0×", "3.0×"};
         final float[] vals = {0.25f, 0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 1.75f, 2.0f, 3.0f};
-        float cur = service.getPlayer().getPlaybackParameters().speed;
+        float cur = service.getSpeed();
         int sel = 3;
         for (int i = 0; i < vals.length; i++) if (Math.abs(vals[i] - cur) < 0.01f) { sel = i; break; }
         new MaterialAlertDialogBuilder(this).setTitle("Playback speed")

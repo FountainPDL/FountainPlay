@@ -20,9 +20,13 @@ public final class FolderScanner {
     private FolderScanner() {}
 
     private static final Set<String> AUDIO_EXT = new HashSet<>(Arrays.asList(
-        "mp3", "m4a", "aac", "flac", "wav", "ogg", "oga", "opus", "wma", "amr", "mka", "ac3", "eac3", "dts", "alac", "mid", "midi"));
+        "mp3", "m4a", "m4b", "m4r", "aac", "flac", "wav", "ogg", "oga", "opus", "wma", "amr", "awb", "mka",
+        "ac3", "eac3", "ec3", "dts", "dtshd", "thd", "mlp", "alac", "ape", "wv", "mpc", "tta", "tak", "aiff", "aif", "aifc",
+        "au", "snd", "ra", "caf", "gsm", "spx", "mp2", "mp1", "mpga", "3ga", "mid", "midi", "kar", "mod", "xm", "it", "s3m",
+        "oma", "voc", "w64", "shn", "weba"));
     private static final Set<String> VIDEO_EXT = new HashSet<>(Arrays.asList(
-        "mp4", "mkv", "avi", "mov", "flv", "webm", "wmv", "m4v", "3gp", "ts", "mpg", "mpeg", "m2ts"));
+        "mp4", "mkv", "avi", "mov", "flv", "webm", "wmv", "asf", "m4v", "3gp", "3g2", "3gpp", "ts", "mts", "m2ts", "mpg", "mpeg",
+        "mpe", "vob", "ogv", "ogm", "divx", "xvid", "rm", "rmvb", "f4v", "dat", "wtv", "mxf", "dv", "mp4v", "evo", "qt", "hevc", "h264", "h265", "y4m"));
 
     public static String ext(String name) {
         int i = name == null ? -1 : name.lastIndexOf('.');
@@ -92,6 +96,54 @@ public final class FolderScanner {
             if (out.size() >= max) return;
             if (f.isDirectory()) walk(f, out, max, dur, depth + 1);
             else if (isMedia(f.getName())) out.add(fromFile(f, dur));
+        }
+    }
+
+    private static final Set<String> SKIP_DIRS = new HashSet<>(Arrays.asList(
+        "android", "cache", ".cache", "thumbnails", ".thumbnails", "lost.dir", "node_modules", "tmp", "temp"));
+
+    /**
+     * Walks internal storage and SD cards (needs All files access) for media that MediaStore did not report.
+     * Dot-folders and .nomedia folders are skipped unless includeNoMedia is on; Manage folders can add any folder explicitly.
+     * Tags and durations come from the saved index, so a repeat scan only reads new or changed files.
+     */
+    public static List<MediaItem> scanStorage(Context ctx, Set<String> known, MediaIndex index,
+                                              boolean includeNoMedia, int readBudget) {
+        List<MediaItem> out = new ArrayList<>();
+        int[] budget = {readBudget};
+        for (File root : storageRoots(ctx)) walkStorage(root, true, known, index, includeNoMedia, budget, out, 0);
+        index.forgetMissing();
+        index.save();
+        return out;
+    }
+
+    private static void walkStorage(File dir, boolean isRoot, Set<String> known, MediaIndex index,
+                                    boolean includeNoMedia, int[] budget, List<MediaItem> out, int depth) {
+        if (depth > 14 || out.size() > 20000) return;
+        File[] files = dir.listFiles();
+        if (files == null) return;
+        if (!includeNoMedia && !isRoot && hasNoMedia(dir)) return;
+        for (File f : files) {
+            String name = f.getName();
+            if (f.isDirectory()) {
+                String lower = name.toLowerCase(Locale.ROOT);
+                if (name.startsWith(".") && !includeNoMedia) continue;
+                if (SKIP_DIRS.contains(lower) && (isRoot || !lower.equals("temp"))) continue;
+                walkStorage(f, false, known, index, includeNoMedia, budget, out, depth + 1);
+            } else if (isMedia(name)) {
+                String path = f.getAbsolutePath();
+                if (known.contains(path) || f.length() < 30_000) continue;
+                MediaItem m = fromFile(f, false);
+                long mtime = f.lastModified(), size = f.length();
+                if (!index.apply(m, mtime, size)) {
+                    if (budget[0] > 0) {
+                        budget[0]--;
+                        m = fromFile(f, true);
+                        index.put(m, mtime, size);
+                    }
+                }
+                out.add(m);
+            }
         }
     }
 

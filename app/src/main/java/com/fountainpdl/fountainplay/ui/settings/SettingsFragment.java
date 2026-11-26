@@ -26,8 +26,11 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import java.util.Locale;
 import androidx.navigation.fragment.NavHostFragment;
 import com.fountainpdl.fountainplay.R;
+import com.fountainpdl.fountainplay.player.LockScreenActivity;
+import com.fountainpdl.fountainplay.util.AllFiles;
 import com.fountainpdl.fountainplay.util.AppPreferences;
 import com.fountainpdl.fountainplay.util.LibraryRepo;
 import com.google.android.material.color.DynamicColors;
@@ -71,6 +74,11 @@ public class SettingsFragment extends Fragment {
     @Override public void onResume() {
         super.onResume();
         if (container != null) build();
+        // All files access was just turned on: index everything now
+        if (AllFiles.granted() && !prefs.getBoolean("all_files_indexed", false)) {
+            prefs.setBoolean("all_files_indexed", true);
+            LibraryRepo.get(requireContext()).refresh();
+        }
     }
 
     private void build() {
@@ -85,14 +93,25 @@ public class SettingsFragment extends Fragment {
             AppPreferences.KEY_DYNAMIC_COLOR, false, dynOk, checked -> requireActivity().recreate());
 
         header("Notifications and background");
-        toggleRow(R.drawable.ic_notifications, "Show player notification and lock-screen controls",
-            "Controls in the notification shade, on the lock screen and on Bluetooth devices. Also keeps music alive in the background.",
-            AppPreferences.KEY_SHOW_NOTIFICATION, true, true, checked -> {
-                if (checked && !notificationsAllowed()) askNotificationPermission();
-            });
         toggleRow(R.drawable.ic_music_note, "Keep playing when the app is closed",
             "Music continues after you swipe the app away from Recents",
             AppPreferences.KEY_BACKGROUND, true, true, null);
+        toggleRow(R.drawable.ic_notifications, "Lock screen player",
+            "Cover art, controls and \"Slide to unlock\" over the lock screen when the screen turns off while music plays",
+            AppPreferences.KEY_LOCK_SCREEN, true, true, checked -> {
+                if (checked && !canOverlay()) askOverlay();
+            });
+        choiceRow(R.drawable.ic_visibility, "Display over other apps",
+            canOverlay() ? "Allowed" : "Blocked", v -> askOverlay());
+        if (isXiaomi()) {
+            actionRow(R.drawable.ic_info, "Xiaomi / MIUI permissions",
+                "Turn on Show on lock screen and Display pop-up windows while running in the background, and set Autostart on",
+                v -> openMiuiPermissions());
+        }
+        actionRow(R.drawable.ic_play, "Preview the lock screen player",
+            "See how it looks without locking your phone", v ->
+                startActivity(new Intent(requireContext(), LockScreenActivity.class)
+                    .putExtra(LockScreenActivity.EXTRA_PREVIEW, true)));
 
         header("Background playback check");
         choiceRow(R.drawable.ic_notifications, "Notification permission",
@@ -120,6 +139,16 @@ public class SettingsFragment extends Fragment {
         actionRow(R.drawable.ic_folder_off, "Manage folders",
             "Hide folders, or scan folders that contain a .nomedia file", v ->
                 NavHostFragment.findNavController(this).navigate(R.id.nav_manage_folders));
+        choiceRow(R.drawable.ic_folder, "All files access",
+            AllFiles.granted() ? "Allowed" : AllFiles.supported() ? "Not allowed" : "Not needed", v -> openAllFiles());
+        toggleRow(R.drawable.ic_refresh, "Scan all storage automatically",
+            "Finds songs and videos Android never indexed, in any folder. Needs All files access.",
+            AppPreferences.KEY_SCAN_ALL, true, AllFiles.supported(),
+            checked -> LibraryRepo.get(requireContext()).refresh());
+        toggleRow(R.drawable.ic_folder_off, "Include .nomedia and hidden folders",
+            "Also scan folders Android skips (can add app caches and voice notes)",
+            AppPreferences.KEY_SCAN_NOMEDIA, false, AllFiles.supported(),
+            checked -> LibraryRepo.get(requireContext()).refresh());
         actionRow(R.drawable.ic_refresh, "Rescan library", "Look for new and removed files", v -> {
             LibraryRepo.get(requireContext()).refresh();
             Toast.makeText(requireContext(), "Scanning…", Toast.LENGTH_SHORT).show();
@@ -290,6 +319,56 @@ public class SettingsFragment extends Fragment {
         try {
             startActivity(new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS));
             Toast.makeText(requireContext(), "Find Fountain Play and choose Don't optimise", Toast.LENGTH_LONG).show();
+        } catch (Exception e) {
+            openAppDetails();
+        }
+    }
+
+    private boolean canOverlay() {
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.canDrawOverlays(requireContext());
+    }
+
+    private void askOverlay() {
+        try {
+            startActivity(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                Uri.parse("package:" + requireContext().getPackageName())));
+            Toast.makeText(requireContext(), "Allow Fountain Play to display over other apps", Toast.LENGTH_LONG).show();
+        } catch (Exception e) {
+            openAppDetails();
+        }
+    }
+
+    private boolean isXiaomi() {
+        String m = Build.MANUFACTURER == null ? "" : Build.MANUFACTURER.toLowerCase(Locale.ROOT);
+        return m.contains("xiaomi") || m.contains("redmi") || m.contains("poco");
+    }
+
+    private void openMiuiPermissions() {
+        String pkg = requireContext().getPackageName();
+        try {
+            Intent i = new Intent("miui.intent.action.APP_PERM_EDITOR");
+            i.setClassName("com.miui.securitycenter", "com.miui.permcenter.permissions.PermissionsEditorActivity");
+            i.putExtra("extra_pkgname", pkg);
+            startActivity(i);
+        } catch (Exception e) {
+            try {
+                Intent i2 = new Intent("miui.intent.action.APP_PERM_EDITOR");
+                i2.setPackage("com.miui.securitycenter");
+                i2.putExtra("extra_pkgname", pkg);
+                startActivity(i2);
+            } catch (Exception e2) {
+                openAppDetails();
+            }
+        }
+    }
+
+    private void openAllFiles() {
+        if (!AllFiles.supported()) {
+            Toast.makeText(requireContext(), "Not needed on this Android version", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        try {
+            startActivity(AllFiles.settingsIntent(requireContext()));
         } catch (Exception e) {
             openAppDetails();
         }

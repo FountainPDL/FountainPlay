@@ -21,6 +21,9 @@ public class AppPreferences {
     public static final String KEY_EXCLUDED_FOLDERS  = "excluded_folders";
     public static final String KEY_EXTRA_FOLDERS     = "extra_folders";
     public static final String KEY_SHOW_HIDDEN       = "show_hidden_files";
+    public static final String KEY_LOCK_SCREEN       = "lock_screen_player";
+    public static final String KEY_SCAN_ALL          = "scan_all_storage";
+    public static final String KEY_SCAN_NOMEDIA      = "scan_nomedia_folders";
 
     private final SharedPreferences p;
 

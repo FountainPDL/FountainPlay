@@ -256,6 +256,12 @@ public class MainActivity extends BaseActivity implements PlaybackState.Listener
         return navController.navigateUp() || super.onSupportNavigateUp();
     }
 
+    @Override protected void onResume() {
+        super.onResume();
+        // Automatic indexing: pick up new files when the app returns after a while
+        if (hasMediaPermission()) LibraryRepo.get(this).refreshIfStale(10 * 60 * 1000L);
+    }
+
     @Override protected void onDestroy() {
         super.onDestroy();
         PlaybackState.get().removeListener(this);

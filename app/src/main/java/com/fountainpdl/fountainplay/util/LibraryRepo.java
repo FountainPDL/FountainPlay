@@ -37,6 +37,8 @@ public final class LibraryRepo {
     private volatile boolean loaded = false;
     private boolean loading = false;
     private boolean pending = false;
+    private int followUps = 0;
+    private volatile long lastLoadedAt = 0;
 
     private final Runnable delayedRefresh = this::refresh;
     private final ContentObserver observer = new ContentObserver(main) {
@@ -70,6 +72,11 @@ public final class LibraryRepo {
 
     public void ensureLoaded() { if (!loaded) refresh(); }
 
+    /** Rescan when the last scan is older than maxAgeMs. */
+    public void refreshIfStale(long maxAgeMs) {
+        if (loaded && System.currentTimeMillis() - lastLoadedAt > maxAgeMs) refresh();
+    }
+
     public void refresh() {
         main.post(() -> {
             if (loading) { pending = true; return; }
@@ -98,6 +105,15 @@ public final class LibraryRepo {
                     if (m.isVideo()) v.add(m); else a.add(m);
                 }
             }
+            // All files access: find media Android never indexed (cached, so only new files are read)
+            if (AllFiles.granted() && prefs.getBoolean(AppPreferences.KEY_SCAN_ALL, true)) {
+                List<MediaItem> extra = FolderScanner.scanStorage(app, known, MediaIndex.get(app),
+                    prefs.getBoolean(AppPreferences.KEY_SCAN_NOMEDIA, false), 150);
+                for (MediaItem m : extra) {
+                    if (!known.add(m.getPath())) continue;
+                    if (m.isVideo()) v.add(m); else a.add(m);
+                }
+            }
             sortNewestFirst(a);
             sortNewestFirst(v);
 
@@ -108,11 +124,19 @@ public final class LibraryRepo {
             video = withoutExcluded(v, excluded);
         } catch (Throwable ignored) {
         }
+        // New files found by the storage walk get their durations a batch at a time: keep going until done
+        boolean unfinished = false;
+        for (MediaItem m : audioAll) if (m.getDuration() <= 0 && m.getId() == 0) { unfinished = true; break; }
+        if (!unfinished) for (MediaItem m : videoAll) if (m.getDuration() <= 0 && m.getId() == 0) { unfinished = true; break; }
+        final boolean again = unfinished && followUps < 8;
         main.post(() -> {
             loaded = true;
+            lastLoadedAt = System.currentTimeMillis();
             loading = false;
             for (Listener l : listeners) l.onLibraryChanged();
             if (pending) { pending = false; refresh(); }
+            else if (again) { followUps++; main.postDelayed(delayedRefresh, 4000); }
+            else if (!again) followUps = 0;
         });
     }
 

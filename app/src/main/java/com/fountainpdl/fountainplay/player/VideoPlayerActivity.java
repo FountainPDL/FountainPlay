@@ -53,6 +53,7 @@ import androidx.media3.ui.TrackSelectionDialogBuilder;
 import com.fountainpdl.fountainplay.R;
 import com.fountainpdl.fountainplay.db.AppDatabase;
 import com.fountainpdl.fountainplay.db.entity.HistoryItem;
+import com.fountainpdl.fountainplay.engine.EngineSelector;
 import com.fountainpdl.fountainplay.util.AppPreferences;
 import com.fountainpdl.fountainplay.util.MediaUris;
 import com.fountainpdl.fountainplay.util.ResumeStore;
@@ -96,6 +97,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
     private boolean gesturesEnabled = true;
     private boolean wasPlayingBeforePause = false;
     private String lastMediaId;
+    private boolean fellBack = false;
 
     // gesture state
     private float downX, downY;
@@ -246,6 +248,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
             title = getIntent().getData().getLastPathSegment();
         }
         if (uriStr == null) { finish(); return false; }
+        if (EngineSelector.videoNeedsVlc(uriStr)) { openInVlc(uriStr, title, 0); return false; }
 
         List<MediaItem> items = new ArrayList<>();
         int start = 0;
@@ -301,7 +304,18 @@ public class VideoPlayerActivity extends AppCompatActivity {
                 updateNextPrev();
                 if (item != null) saveVideoHistory(item);
             }
+            @Override public void onTracksChanged(Tracks tracks) {
+                // A video or audio track that no decoder here can play: VLC can
+                if (fellBack) return;
+                boolean hasAudio = false, audioOk = false, hasVideo = false, videoOk = false;
+                for (Tracks.Group g : tracks.getGroups()) {
+                    if (g.getType() == C.TRACK_TYPE_AUDIO) { hasAudio = true; if (g.isSupported()) audioOk = true; }
+                    else if (g.getType() == C.TRACK_TYPE_VIDEO) { hasVideo = true; if (g.isSupported()) videoOk = true; }
+                }
+                if ((hasAudio && !audioOk) || (hasVideo && !videoOk)) handOverToVlc();
+            }
             @Override public void onPlayerError(PlaybackException error) {
+                if (!fellBack) { handOverToVlc(); return; }
                 Toast.makeText(VideoPlayerActivity.this,
                     "Can't play this video (" + error.getErrorCodeName() + ")", Toast.LENGTH_LONG).show();
                 setControlsVisible(true);
@@ -314,6 +328,27 @@ public class VideoPlayerActivity extends AppCompatActivity {
         updateNextPrev();
         saveVideoHistory(first);
         return true;
+    }
+
+    /** ExoPlayer cannot play this file (or part of it): continue in the VLC player from the same spot. */
+    private void handOverToVlc() {
+        if (fellBack || player == null) return;
+        MediaItem cur = player.getCurrentMediaItem();
+        if (cur == null) return;
+        fellBack = true;
+        String title = cur.mediaMetadata.title == null ? "Video" : cur.mediaMetadata.title.toString();
+        saveProgress();
+        openInVlc(cur.mediaId, title, Math.max(0, player.getCurrentPosition()));
+    }
+
+    private void openInVlc(String path, String title, long startMs) {
+        fellBack = true;
+        Intent i = new Intent(this, VlcVideoPlayerActivity.class);
+        i.putExtra(VlcVideoPlayerActivity.EXTRA_URI, path);
+        i.putExtra(VlcVideoPlayerActivity.EXTRA_TITLE, title);
+        i.putExtra(VlcVideoPlayerActivity.EXTRA_START, startMs);
+        startActivity(i);
+        finish();
     }
 
     private void saveVideoHistory(MediaItem item) {

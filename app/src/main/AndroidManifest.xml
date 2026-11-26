@@ -9,6 +9,8 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <application
         android:name=".FountainApp"
@@ -66,16 +68,38 @@
             </intent-filter>
         </activity>
 
-        <!-- Media3 session service: owns the single ExoPlayer, the notification and the lock-screen controls.
-             stopWithTask=false keeps music playing after the app is cleared from Recents. -->
+        <!-- The music service: engines, media session, notification. stopWithTask=false keeps music playing
+             after the app is cleared from Recents. -->
         <service android:name=".service.PlaybackService"
-            android:exported="true"
+            android:exported="false"
             android:stopWithTask="false"
             android:foregroundServiceType="mediaPlayback">
             <intent-filter>
-                <action android:name="androidx.media3.session.MediaSessionService" />
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
         </service>
+
+        <receiver android:name="androidx.media.session.MediaButtonReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Lock-screen player: shown over the keyguard, kept out of Recents -->
+        <activity android:name=".player.LockScreenActivity"
+            android:exported="false"
+            android:launchMode="singleInstance"
+            android:taskAffinity=""
+            android:excludeFromRecents="true"
+            android:showWhenLocked="true"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.FountainPlay.Player" />
+
+        <!-- Second video engine (VLC) -->
+        <activity android:name=".player.VlcVideoPlayerActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
+            android:exported="false"
+            android:theme="@style/Theme.FountainPlay.Video" />
 
     </application>
 </manifest>
